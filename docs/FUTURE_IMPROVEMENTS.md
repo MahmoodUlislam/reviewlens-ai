@@ -106,11 +106,20 @@ Streaming Response with Citations
 
 ## Phase 4: Production Hardening
 
-### Security
-- AWS Cognito for user authentication with RBAC
-- API Gateway with WAF for DDoS protection
-- VPC endpoints for Bedrock and Comprehend (no public internet)
-- Secrets Manager for API keys (replace environment variables)
+### Network & Security Architecture
+
+The current prototype deploys directly on AWS Amplify as a publicly accessible application — no VPC, no authentication, no API Gateway. This is intentional for a rapid prototype with zero-auth requirements.
+
+In production, the architecture would be significantly hardened:
+
+- **VPC with private subnets** — All compute (ECS/Lambda) runs in private subnets with no direct internet access
+- **Application Load Balancer (ALB)** or **Network Load Balancer (NLB)** — ALB for HTTP/HTTPS traffic with SSL termination, path-based routing, and WAF integration. NLB if low-latency TCP/WebSocket connections are needed for real-time streaming
+- **API Gateway** — RESTful API management with usage plans, throttling, request validation, and API key management. Acts as the single entry point for all backend services
+- **Amazon Cognito** — User authentication with Amplify Auth integration. Supports MFA, social sign-in, and custom auth flows. RBAC via Cognito Groups (e.g., Analyst, Admin roles)
+- **Amplify Auth** — Client-side auth UI components integrated with Cognito for seamless sign-up/sign-in flows
+- **VPC Endpoints** — Private connectivity to Bedrock and Comprehend (no traffic over public internet)
+- **AWS Secrets Manager** — All API keys and credentials stored securely (replace environment variables)
+- **WAF (Web Application Firewall)** — Attached to ALB/API Gateway for SQL injection, XSS, and bot protection
 
 ### Observability
 - X-Ray tracing across Lambda, Bedrock, Comprehend calls
