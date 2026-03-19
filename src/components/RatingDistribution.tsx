@@ -40,6 +40,8 @@ export default function RatingDistribution({ distribution }: RatingDistributionP
               backdropFilter: "blur(20px)",
               color: "#f0f0ff",
             }}
+            itemStyle={{ color: "#f0f0ff" }}
+            labelStyle={{ color: "#f0f0ff" }}
           />
           <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={24}>
             {data.map((entry, index) => (

@@ -1,11 +1,32 @@
 import { NextRequest } from "next/server";
-import { getSession } from "@/lib/store";
+import { getSession, setSession } from "@/lib/store";
 import { buildSystemPrompt } from "@/lib/prompts";
 import { streamBedrockResponse } from "@/lib/bedrock";
+import { ReviewSession } from "@/types";
+
+export const dynamic = "force-dynamic";
+
+// Convert async generator to a ReadableStream using the pull pattern
+// (recommended by Next.js docs for proper chunk-by-chunk streaming)
+function iteratorToStream(
+  iterator: AsyncGenerator<Uint8Array, void, unknown>
+): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    async pull(controller) {
+      const { value, done } = await iterator.next();
+      if (done) {
+        controller.close();
+      } else {
+        controller.enqueue(value);
+      }
+    },
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId, message, history = [] } = await request.json();
+    const { sessionId, message, history = [], sessionData } =
+      await request.json();
 
     if (!sessionId || !message) {
       return new Response(
@@ -14,7 +35,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const session = getSession(sessionId);
+    // Try in-memory store first; if missing, hydrate from client-provided sessionData
+    let session = getSession(sessionId);
+
+    if (!session && sessionData) {
+      const restored: ReviewSession = {
+        sessionId,
+        reviews: sessionData.reviews,
+        metadata: sessionData.metadata,
+        analytics: sessionData.analytics,
+      };
+      setSession(sessionId, restored);
+      session = restored;
+    }
 
     if (!session) {
       return new Response(
@@ -42,79 +75,77 @@ export async function POST(request: NextRequest) {
     const guardrailVersion = process.env.BEDROCK_GUARDRAIL_VERSION || "DRAFT";
 
     const encoder = new TextEncoder();
+    const confirmedSession = session;
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          const generator = streamBedrockResponse({
-            systemPrompt,
-            messages,
-            guardrailId,
-            guardrailVersion,
-          });
+    // Async generator that yields SSE-encoded chunks
+    async function* makeSSEIterator(): AsyncGenerator<
+      Uint8Array,
+      void,
+      unknown
+    > {
+      try {
+        const generator = streamBedrockResponse({
+          systemPrompt,
+          messages,
+          guardrailId,
+          guardrailVersion,
+        });
 
-          for await (const chunk of generator) {
-            if (chunk.type === "text") {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ type: "text", content: chunk.text })}\n\n`
-                )
-              );
-            } else if (chunk.type === "guard") {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ type: "guard", action: chunk.action, content: chunk.message })}\n\n`
-                )
-              );
-            }
-          }
-
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-          );
-        } catch (error) {
-          console.error("Bedrock streaming error:", error);
-
-          // Check if it's a guardrail intervention (Bedrock throws on blocked)
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          if (
-            errorMessage.includes("guardrail") ||
-            errorMessage.includes("GUARDRAIL")
-          ) {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  type: "guard",
-                  action: "BLOCKED",
-                  content: `I can only analyze the ${session.metadata.totalReviews} ${session.metadata.platform} reviews loaded for **${session.metadata.productName}**. That question falls outside the scope of the ingested review data. Feel free to ask me anything about the reviews!`,
-                })}\n\n`
-              )
+        for await (const chunk of generator) {
+          if (chunk.type === "text") {
+            yield encoder.encode(
+              `data: ${JSON.stringify({ type: "text", content: chunk.text })}\n\n`
             );
-          } else {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  type: "error",
-                  content: "An error occurred while generating a response. Please try again.",
-                })}\n\n`
-              )
+          } else if (chunk.type === "guard") {
+            yield encoder.encode(
+              `data: ${JSON.stringify({ type: "guard", action: chunk.action, content: chunk.message })}\n\n`
             );
           }
-
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-          );
-        } finally {
-          controller.close();
         }
-      },
-    });
+
+        yield encoder.encode(
+          `data: ${JSON.stringify({ type: "done" })}\n\n`
+        );
+      } catch (error) {
+        console.error("Bedrock streaming error:", error);
+
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        if (
+          errorMessage.includes("guardrail") ||
+          errorMessage.includes("GUARDRAIL")
+        ) {
+          yield encoder.encode(
+            `data: ${JSON.stringify({
+              type: "guard",
+              action: "BLOCKED",
+              content: `I can only analyze the ${confirmedSession.metadata.totalReviews} ${confirmedSession.metadata.platform} reviews loaded for **${confirmedSession.metadata.productName}**. That question falls outside the scope of the ingested review data. Feel free to ask me anything about the reviews!`,
+            })}\n\n`
+          );
+        } else {
+          yield encoder.encode(
+            `data: ${JSON.stringify({
+              type: "error",
+              content:
+                "An error occurred while generating a response. Please try again.",
+            })}\n\n`
+          );
+        }
+
+        yield encoder.encode(
+          `data: ${JSON.stringify({ type: "done" })}\n\n`
+        );
+      }
+    }
+
+    const stream = iteratorToStream(makeSSEIterator());
 
     return new Response(stream, {
       headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
         Connection: "keep-alive",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {

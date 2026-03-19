@@ -4,7 +4,7 @@ import { parseCSV } from "@/lib/csv-parser";
 import { analyzeSentiment } from "@/lib/comprehend";
 import { computeAnalytics } from "@/lib/analytics";
 import { setSession } from "@/lib/store";
-import { scrapeAmazonReviews, scrapeWithLambdaFallback } from "@/lib/scraper";
+import { scrapeAmazonReviews } from "@/lib/scraper";
 import { Review, ReviewMetadata, ReviewSession } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -15,37 +15,18 @@ export async function POST(request: NextRequest) {
     let reviews: Review[] = [];
     let productName = "Unknown Product";
     let productUrl = url || "";
+    let overallRating: number | undefined;
+    let totalGlobalRatings: number | undefined;
 
     if (type === "url" && url) {
-      // Scraping strategy: Lambda/Puppeteer (free) → Apify (uses credits) → CSV fallback
-      let scraped = false;
-
-      // 1. Try Lambda/Puppeteer first (free, no credits)
       try {
-        console.log("Attempting Lambda/Puppeteer scrape for:", url);
-        const result = await scrapeWithLambdaFallback(url);
+        const result = await scrapeAmazonReviews(url);
         reviews = result.reviews;
         productName = result.productName;
-        scraped = true;
-      } catch (lambdaError) {
-        console.warn("Lambda/Puppeteer scrape failed:", lambdaError);
-      }
-
-      // 2. Fall back to Apify (uses credits, but reliable)
-      if (!scraped) {
-        try {
-          console.log("Attempting Apify scrape for:", url);
-          const result = await scrapeAmazonReviews(url);
-          reviews = result.reviews;
-          productName = result.productName;
-          scraped = true;
-        } catch (apifyError) {
-          console.warn("Apify scrape also failed:", apifyError);
-        }
-      }
-
-      // 3. If both failed, tell user to use CSV
-      if (!scraped) {
+        overallRating = result.overallRating;
+        totalGlobalRatings = result.totalGlobalRatings;
+      } catch (scrapeError) {
+        console.warn("Scrape failed:", scrapeError);
         return NextResponse.json(
           {
             success: false,
@@ -93,6 +74,8 @@ export async function POST(request: NextRequest) {
       productUrl,
       totalReviews: enrichedReviews.length,
       averageRating: analytics.averageRating,
+      overallRating,
+      totalGlobalRatings,
       dateRange: {
         earliest: dates[0] || "Unknown",
         latest: dates[dates.length - 1] || "Unknown",
@@ -114,6 +97,8 @@ export async function POST(request: NextRequest) {
       success: true,
       sessionId,
       metadata,
+      reviews: enrichedReviews,
+      analytics,
       reviewCount: enrichedReviews.length,
     });
   } catch (error) {

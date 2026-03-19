@@ -75,6 +75,8 @@ export default function IngestForm() {
       }
       sessionStorage.setItem("reviewlens_session", data.sessionId);
       sessionStorage.setItem("reviewlens_metadata", JSON.stringify(data.metadata));
+      sessionStorage.setItem("reviewlens_reviews", JSON.stringify(data.reviews));
+      sessionStorage.setItem("reviewlens_analytics", JSON.stringify(data.analytics));
       router.push("/dashboard");
     } catch {
       setError("Network error. Please try again.");

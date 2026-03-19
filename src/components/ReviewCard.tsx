@@ -9,16 +9,40 @@ interface ReviewCardProps {
   index: number;
 }
 
+const sentimentConfig = {
+  POSITIVE: {
+    badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+    border: "border-l-emerald-500",
+    glow: "shadow-emerald-500/5",
+  },
+  NEGATIVE: {
+    badge: "bg-red-500/15 text-red-400 border-red-500/20",
+    border: "border-l-red-500",
+    glow: "shadow-red-500/5",
+  },
+  NEUTRAL: {
+    badge: "bg-slate-500/15 text-slate-400 border-slate-500/20",
+    border: "border-l-slate-500",
+    glow: "shadow-slate-500/5",
+  },
+  MIXED: {
+    badge: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+    border: "border-l-amber-500",
+    glow: "shadow-amber-500/5",
+  },
+};
+
 export default function ReviewCard({ review, index }: ReviewCardProps) {
-  const sentimentStyles = {
-    POSITIVE: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-    NEGATIVE: "bg-red-500/15 text-red-400 border-red-500/20",
-    NEUTRAL: "bg-slate-500/15 text-slate-400 border-slate-500/20",
-    MIXED: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  };
+  const sentiment = review.sentiment?.label;
+  const config = sentiment ? sentimentConfig[sentiment] : null;
 
   return (
-    <div className="glass-card rounded-xl p-4 group">
+    <div
+      className={cn(
+        "glass-card rounded-xl p-4 group border-l-[3px]",
+        config ? `${config.border} ${config.glow}` : "border-l-white/10"
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -38,14 +62,19 @@ export default function ReviewCard({ review, index }: ReviewCardProps) {
                 />
               ))}
             </div>
-            {review.sentiment && (
+            {sentiment && config && (
               <span
                 className={cn(
-                  "text-[10px] px-2 py-0.5 rounded-full border font-medium",
-                  sentimentStyles[review.sentiment.label]
+                  "text-[10px] px-2 py-0.5 rounded-full border font-semibold uppercase tracking-wider",
+                  config.badge
                 )}
               >
-                {review.sentiment.label.toLowerCase()}
+                {sentiment.toLowerCase()}
+              </span>
+            )}
+            {review.sentiment && (
+              <span className="text-[10px] text-white/20 font-mono">
+                {(review.sentiment.score * 100).toFixed(0)}%
               </span>
             )}
           </div>

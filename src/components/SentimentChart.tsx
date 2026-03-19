@@ -69,6 +69,8 @@ export default function SentimentChart({ breakdown }: SentimentChartProps) {
               backdropFilter: "blur(20px)",
               color: "#f0f0ff",
             }}
+            itemStyle={{ color: "#f0f0ff" }}
+            labelStyle={{ color: "#f0f0ff" }}
           />
           <Legend
             wrapperStyle={{ color: "rgba(255,255,255,0.5)", fontSize: "12px" }}

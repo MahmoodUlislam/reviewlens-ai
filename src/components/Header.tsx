@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, MessageSquare, BarChart3 } from "lucide-react";
+import { Search, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,6 @@ export default function Header() {
   const navItems = [
     { href: "/", label: "Ingest", icon: Search },
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { href: "/chat", label: "Q&A Chat", icon: MessageSquare },
   ];
 
   return (

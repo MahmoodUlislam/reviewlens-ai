@@ -20,6 +20,8 @@ export interface ReviewMetadata {
   productUrl: string;
   totalReviews: number;
   averageRating: number;
+  overallRating?: number;
+  totalGlobalRatings?: number;
   dateRange: { earliest: string; latest: string };
   scrapedAt: string;
 }

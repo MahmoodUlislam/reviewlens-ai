@@ -29,12 +29,14 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
       glow: "shadow-violet-500/20",
     },
     {
-      label: "Average Rating",
-      value: analytics.averageRating.toFixed(1),
+      label: metadata.overallRating ? "Overall Rating" : "Average Rating",
+      value: (metadata.overallRating ?? analytics.averageRating).toFixed(1),
       icon: Star,
       gradient: "from-amber-500 to-orange-600",
       glow: "shadow-amber-500/20",
-      suffix: "/ 5",
+      suffix: metadata.totalGlobalRatings
+        ? `/ 5 · ${metadata.totalGlobalRatings.toLocaleString()} ratings`
+        : "/ 5",
     },
     {
       label: "Positive Sentiment",

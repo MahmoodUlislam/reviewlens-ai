@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Send,
   Loader2,
@@ -12,12 +11,14 @@ import {
   User,
   Sparkles,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { ChatMessage, ReviewMetadata } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface ChatInterfaceProps {
   sessionId: string;
   metadata: ReviewMetadata;
+  compact?: boolean;
 }
 
 const SUGGESTED_QUESTIONS = [
@@ -29,18 +30,21 @@ const SUGGESTED_QUESTIONS = [
   "Compare 5-star vs 1-star review themes",
 ];
 
-export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProps) {
+export default function ChatInterface({ sessionId, metadata, compact }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
+  // Auto-scroll on every message update (including streaming chunks)
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
@@ -72,10 +76,26 @@ export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProp
         content: m.content,
       }));
 
+      // On first message, send session data so the server can hydrate its store
+      // (Turbopack runs route handlers in separate workers with isolated memory)
+      let sessionData: Record<string, unknown> | undefined;
+      if (messages.length === 0) {
+        try {
+          const reviews = JSON.parse(sessionStorage.getItem("reviewlens_reviews") || "[]");
+          const meta = JSON.parse(sessionStorage.getItem("reviewlens_metadata") || "{}");
+          const analytics = JSON.parse(sessionStorage.getItem("reviewlens_analytics") || "{}");
+          sessionData = { reviews, metadata: meta, analytics };
+        } catch { /* proceed without */ }
+      }
+
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, message: text, history }),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Encoding": "identity",
+          "Accept": "text/event-stream",
+        },
+        body: JSON.stringify({ sessionId, message: text, history, sessionData }),
       });
 
       if (!response.ok) throw new Error("Chat request failed");
@@ -86,42 +106,47 @@ export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProp
       const decoder = new TextDecoder();
       let buffer = "";
 
-      while (true) {
+      for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n\n");
-        buffer = lines.pop() || "";
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === "text") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, content: m.content + data.content } : m
-                )
-              );
-            } else if (data.type === "guard") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: data.content, scopeGuardTriggered: true, guardrailAction: data.action }
-                    : m
-                )
-              );
-            } else if (data.type === "error") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, content: data.content } : m
-                )
-              );
+        let boundary = buffer.indexOf("\n\n");
+        while (boundary !== -1) {
+          const line = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+
+          if (line.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === "text") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId ? { ...m, content: m.content + data.content } : m
+                  )
+                );
+              } else if (data.type === "guard") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? { ...m, content: data.content, scopeGuardTriggered: true, guardrailAction: data.action }
+                      : m
+                  )
+                );
+              } else if (data.type === "error") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId ? { ...m, content: data.content } : m
+                  )
+                );
+              }
+            } catch {
+              /* skip invalid JSON */
             }
-          } catch {
-            /* skip invalid JSON */
           }
+
+          boundary = buffer.indexOf("\n\n");
         }
       }
     } catch {
@@ -145,38 +170,46 @@ export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProp
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)]">
-      {/* Chat header */}
-      <div className="glass-card rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-linear-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-          <Shield className="w-4 h-4 text-white" />
+    <div className={cn("flex flex-col", compact ? "h-full" : "h-[calc(100vh-10rem)]")}>
+      {/* Chat header — hidden in compact/drawer mode */}
+      {!compact && (
+        <div className="glass-card rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <Shield className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white/90">
+              Guardrailed Q&A — {metadata.productName}
+            </p>
+            <p className="text-xs text-white/35">
+              {metadata.totalReviews} {metadata.platform} reviews &middot; Dual-layer scope guard active
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white/90">
-            Guardrailed Q&A — {metadata.productName}
-          </p>
-          <p className="text-xs text-white/35">
-            {metadata.totalReviews} {metadata.platform} reviews &middot; Dual-layer scope guard active
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Messages area */}
-      <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
+      >
         <div className="space-y-4 pb-4">
           {messages.length === 0 && (
-            <div className="text-center py-16 animate-fade-in">
-              <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center mx-auto mb-5 border border-violet-500/10">
-                <Bot className="w-8 h-8 text-violet-400" />
+            <div className={cn("text-center animate-fade-in", compact ? "py-8" : "py-16")}>
+              <div className={cn(
+                "rounded-2xl bg-linear-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center mx-auto border border-violet-500/10",
+                compact ? "w-12 h-12 mb-3" : "w-16 h-16 mb-5"
+              )}>
+                <Bot className={cn(compact ? "w-6 h-6" : "w-8 h-8", "text-violet-400")} />
               </div>
-              <h3 className="text-lg font-semibold text-white/80 mb-2">
+              <h3 className={cn("font-semibold text-white/80 mb-2", compact ? "text-base" : "text-lg")}>
                 Ask about the reviews
               </h3>
-              <p className="text-sm text-white/35 mb-8 max-w-md mx-auto">
+              <p className={cn("text-sm text-white/35 max-w-md mx-auto", compact ? "mb-5" : "mb-8")}>
                 I can analyze the {metadata.totalReviews} ingested {metadata.platform} reviews for{" "}
                 <strong className="text-white/60">{metadata.productName}</strong>. I&apos;m scoped exclusively to this data.
               </p>
-              <div className="flex flex-wrap gap-2 justify-center max-w-lg mx-auto">
+              <div className={cn("flex flex-wrap gap-2 justify-center", compact ? "max-w-sm" : "max-w-lg", "mx-auto")}>
                 {SUGGESTED_QUESTIONS.map((q) => (
                   <button
                     key={q}
@@ -235,17 +268,26 @@ export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProp
                   </div>
                 )}
                 <div className={cn(
-                  "text-sm whitespace-pre-wrap leading-relaxed",
-                  msg.role === "user" ? "text-white" : "text-white/70"
+                  "text-sm leading-relaxed",
+                  msg.role === "user" ? "text-white whitespace-pre-wrap" : "text-white/70"
                 )}>
-                  {msg.content ||
-                    (isStreaming && msg.role === "assistant" ? (
+                  {msg.content ? (
+                    msg.role === "assistant" ? (
+                      <div className="chat-markdown">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.content
+                    )
+                  ) : (
+                    isStreaming && msg.role === "assistant" ? (
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                         <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse delay-100" />
                         <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse delay-200" />
                       </div>
-                    ) : null)}
+                    ) : null
+                  )}
                 </div>
               </div>
 
@@ -256,11 +298,13 @@ export default function ChatInterface({ sessionId, metadata }: ChatInterfaceProp
               )}
             </div>
           ))}
+          {/* Invisible anchor for auto-scroll */}
+          <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input area */}
-      <div className="glass-card rounded-xl p-3 mt-3">
+      <div className="glass-card rounded-xl p-3 mt-3 shrink-0">
         <div className="flex gap-2">
           <Textarea
             ref={textareaRef}

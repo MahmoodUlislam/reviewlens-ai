@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import StatsCards from "@/components/StatsCards";
@@ -8,8 +8,9 @@ import RatingDistribution from "@/components/RatingDistribution";
 import SentimentChart from "@/components/SentimentChart";
 import KeywordsCloud from "@/components/KeywordsCloud";
 import ReviewCard from "@/components/ReviewCard";
+import ChatDrawer from "@/components/ChatDrawer";
 import { Review, ReviewMetadata, AnalyticsData } from "@/types";
-import { MessageSquare, ArrowRight } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,35 +19,31 @@ export default function DashboardPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const closeChat = useCallback(() => setChatOpen(false), []);
 
   useEffect(() => {
-    const sessionId = sessionStorage.getItem("reviewlens_session");
-    if (!sessionId) {
+    const sid = sessionStorage.getItem("reviewlens_session");
+    const metaStr = sessionStorage.getItem("reviewlens_metadata");
+    const reviewsStr = sessionStorage.getItem("reviewlens_reviews");
+    const analyticsStr = sessionStorage.getItem("reviewlens_analytics");
+
+    if (!sid || !metaStr || !reviewsStr || !analyticsStr) {
       router.push("/");
       return;
     }
-    const fetchData = async () => {
-      try {
-        const [reviewsRes, analyticsRes] = await Promise.all([
-          fetch(`/api/reviews?sessionId=${sessionId}`),
-          fetch(`/api/analytics?sessionId=${sessionId}`),
-        ]);
-        if (!reviewsRes.ok || !analyticsRes.ok) {
-          router.push("/");
-          return;
-        }
-        const reviewsData = await reviewsRes.json();
-        const analyticsData = await analyticsRes.json();
-        setReviews(reviewsData.reviews);
-        setMetadata(reviewsData.metadata);
-        setAnalytics(analyticsData.analytics);
-      } catch {
-        router.push("/");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+
+    try {
+      setSessionId(sid);
+      setMetadata(JSON.parse(metaStr));
+      setReviews(JSON.parse(reviewsStr));
+      setAnalytics(JSON.parse(analyticsStr));
+    } catch {
+      router.push("/");
+      return;
+    }
+    setLoading(false);
   }, [router]);
 
   if (loading) {
@@ -88,12 +85,11 @@ export default function DashboardPage() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/chat")}
+            onClick={() => setChatOpen(true)}
             className="gradient-btn text-white font-medium py-2.5 px-5 rounded-xl flex items-center gap-2 text-sm"
           >
             <MessageSquare className="w-4 h-4" />
             Ask Questions
-            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
@@ -139,6 +135,27 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Floating chat button */}
+      {!chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed! bottom-8 right-8 w-14 h-14 rounded-full text-white shadow-xl shadow-violet-500/25 flex items-center justify-center z-40 hover:scale-105 transition-transform"
+          style={{ background: "linear-gradient(135deg, #8b5cf6, #6366f1)" }}
+        >
+          <MessageSquare className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Chat drawer */}
+      {sessionId && metadata && (
+        <ChatDrawer
+          open={chatOpen}
+          onClose={closeChat}
+          sessionId={sessionId}
+          metadata={metadata}
+        />
+      )}
     </>
   );
 }
