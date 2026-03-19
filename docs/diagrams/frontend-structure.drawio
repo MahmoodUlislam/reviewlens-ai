@@ -1,0 +1,238 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.4">
+  <diagram name="Frontend Pages &amp; Components" id="tZCRZpK76J22ZWjPeDuI">
+    <mxGraphModel dx="983" dy="525" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-1" parent="1" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1a1a2e;" value="ReviewLens AI — Frontend Pages &amp; Component Structure" vertex="1">
+          <mxGeometry height="35" width="700" x="300" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;dashed=0;arcSize=4;" value="" vertex="1">
+          <mxGeometry height="1000" width="1500" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-3" parent="1" style="text;html=1;fontSize=13;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#7b1fa2;" value="RootLayout (src/app/layout.tsx)  —  Dark theme, Geist fonts, mesh-gradient background" vertex="1">
+          <mxGeometry height="22" width="600" x="60" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;dashed=1;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="440" width="440" x="60" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-5" parent="1" style="text;html=1;fontSize=14;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#2e7d32;" value="/ (Home Page)  —  src/app/page.tsx" vertex="1">
+          <mxGeometry height="22" width="350" x="80" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-6" parent="1" style="text;html=1;fontSize=10;align=left;fillColor=none;strokeColor=none;fontColor=#555;" value="Landing page with hero section, features list, and review ingestion form" vertex="1">
+          <mxGeometry height="18" width="400" x="80" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=12;fontStyle=1;" value="&lt;Header /&gt;" vertex="1">
+          <mxGeometry height="35" width="400" x="80" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="310" width="400" x="80" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-9" parent="1" style="text;html=1;fontSize=12;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#1b5e20;" value="&lt;IngestForm /&gt;  —  src/components/IngestForm.tsx" vertex="1">
+          <mxGeometry height="20" width="380" x="90" y="215" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#558b2f;fontSize=10;" value="Platform Selector&#xa;[ Amazon | Google Maps | Other ]" vertex="1">
+          <mxGeometry height="40" width="200" x="100" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#558b2f;fontSize=10;" value="Input Mode Tabs&#xa;[ URL Scraping | CSV Upload ]" vertex="1">
+          <mxGeometry height="40" width="200" x="100" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#689f38;fontSize=9;align=left;spacingLeft=8;" value="URL Input&#xa;&#xa;• Product URL field&#xa;• Platform-specific hints&#xa;• Submit button" vertex="1">
+          <mxGeometry height="80" width="170" x="100" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#689f38;fontSize=9;align=left;spacingLeft=8;" value="CSV Upload&#xa;&#xa;• Drag-drop zone&#xa;• Paste textarea&#xa;• Auto-header detection&#xa;• Product name field" vertex="1">
+          <mxGeometry height="80" width="170" x="290" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#558b2f;fontSize=9;" value="Loading State&#xa;(progress animation, status messages)" vertex="1">
+          <mxGeometry height="35" width="250" x="100" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-15" parent="1" style="text;html=1;fontSize=9;align=left;fillColor=none;strokeColor=none;fontColor=#1b5e20;fontStyle=2;" value="→ POST /api/ingest&#xa;→ sessionStorage&#xa;→ router.push(&#39;/dashboard&#39;)" vertex="1">
+          <mxGeometry height="25" width="200" x="90" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;dashed=1;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="440" width="490" x="530" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-17" parent="1" style="text;html=1;fontSize=14;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#1565c0;" value="/dashboard  —  src/app/dashboard/page.tsx" vertex="1">
+          <mxGeometry height="22" width="400" x="550" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-18" parent="1" style="text;html=1;fontSize=10;align=left;fillColor=none;strokeColor=none;fontColor=#555;" value="Analytics dashboard with charts, reviews, and chat access (client component)" vertex="1">
+          <mxGeometry height="18" width="450" x="550" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90caf9;strokeColor=#1565c0;fontSize=12;fontStyle=1;" value="&lt;Header /&gt;" vertex="1">
+          <mxGeometry height="30" width="450" x="550" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=10;fontStyle=0;" value="&lt;StatsCards /&gt;&#xa;Total Reviews | Avg Rating | Positive % | Date Range" vertex="1">
+          <mxGeometry height="40" width="450" x="550" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;" value="&lt;RatingDistribution /&gt;&#xa;Horizontal Bar Chart&#xa;(Recharts)" vertex="1">
+          <mxGeometry height="65" width="145" x="550" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-22" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;" value="&lt;SentimentChart /&gt;&#xa;Donut Pie Chart&#xa;(Recharts)" vertex="1">
+          <mxGeometry height="65" width="140" x="705" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;" value="&lt;KeywordsCloud /&gt;&#xa;Tag cloud&#xa;Top 20 words" vertex="1">
+          <mxGeometry height="65" width="140" x="855" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;align=left;spacingLeft=10;" value="&lt;ReviewCard /&gt; × n  (paginated, 6 per page)&#xa;&#xa;Each card: ★ rating | sentiment badge (colored border) | review text | reviewer | verified" vertex="1">
+          <mxGeometry height="60" width="350" x="550" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7c4dff;fontColor=#ffffff;strokeColor=#651fff;fontSize=10;fontStyle=1;" value="💬 Chat&#xa;(floating btn)" vertex="1">
+          <mxGeometry height="45" width="90" x="920" y="345" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-26" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#512da8;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="100" width="450" x="550" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-27" parent="1" style="text;html=1;fontSize=11;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#4527a0;" value="&lt;ChatDrawer /&gt;  —  Slide-out panel (right side, 65-85vw)" vertex="1">
+          <mxGeometry height="18" width="400" x="560" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-28" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1c4e9;strokeColor=#512da8;fontSize=9;" value="&lt;ChatInterface compact={true} /&gt;&#xa;Contains: message list, input field, suggested questions, streaming" vertex="1">
+          <mxGeometry height="50" width="400" x="570" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-29" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c62828;dashed=1;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="440" width="450" x="1060" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-30" parent="1" style="text;html=1;fontSize=14;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#c62828;" value="/chat  —  src/app/chat/page.tsx" vertex="1">
+          <mxGeometry height="22" width="350" x="1080" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-31" parent="1" style="text;html=1;fontSize=10;align=left;fillColor=none;strokeColor=none;fontColor=#555;" value="Full-page AI Q&amp;A interface (requires active session)" vertex="1">
+          <mxGeometry height="18" width="350" x="1080" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-32" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=12;fontStyle=1;" value="&lt;Header /&gt;" vertex="1">
+          <mxGeometry height="30" width="410" x="1080" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-33" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="320" width="410" x="1080" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-34" parent="1" style="text;html=1;fontSize=11;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#b71c1c;" value="&lt;ChatInterface /&gt;  —  src/components/ChatInterface.tsx" vertex="1">
+          <mxGeometry height="18" width="380" x="1090" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-35" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#e53935;fontSize=9;align=left;spacingLeft=8;" value="Empty State&#xa;• Welcome message&#xa;• Suggested questions&#xa;  (clickable chips)" vertex="1">
+          <mxGeometry height="70" width="170" x="1100" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-36" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#e53935;fontSize=9;align=left;spacingLeft=8;" value="Message List&#xa;• User msgs (gradient pill)&#xa;• Assistant msgs (glass card)&#xa;• Markdown rendering&#xa;• Auto-scroll to bottom" vertex="1">
+          <mxGeometry height="80" width="180" x="1290" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-37" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#e53935;fontSize=9;align=left;spacingLeft=8;" value="Streaming State&#xa;• Text chunks via SSE&#xa;• Incremental display&#xa;• Loading animation" vertex="1">
+          <mxGeometry height="65" width="170" x="1100" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-38" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#e53935;fontSize=9;align=left;spacingLeft=8;" value="Scope Guard&#xa;• Red badge if blocked&#xa;• Guardrail action display&#xa;• Polite decline message" vertex="1">
+          <mxGeometry height="65" width="180" x="1290" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-39" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=10;fontStyle=1;" value="Input Area: text field + send button" vertex="1">
+          <mxGeometry height="30" width="360" x="1100" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-40" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontSize=9;fontStyle=2;" value="Footer: &#39;Powered by Amazon Bedrock + Guardrails&#39;" vertex="1">
+          <mxGeometry height="25" width="360" x="1100" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-41" parent="1" style="text;html=1;fontSize=9;align=left;fillColor=none;strokeColor=none;fontColor=#b71c1c;fontStyle=2;" value="→ POST /api/chat (SSE)&#xa;→ History from state&#xa;→ sessionData hydration on 1st msg" vertex="1">
+          <mxGeometry height="30" width="250" x="1100" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-42" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;dashed=1;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="140" width="1450" x="60" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-43" parent="1" style="text;html=1;fontSize=14;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#f57f17;" value="Shared Components &amp; Libraries" vertex="1">
+          <mxGeometry height="22" width="300" x="80" y="575" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-44" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="Header.tsx&#xa;&#xa;• Logo + nav links&#xa;• Active path highlight&#xa;• Session-aware nav" vertex="1">
+          <mxGeometry height="80" width="160" x="80" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-45" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="utils.ts&#xa;&#xa;cn() — Tailwind&#xa;class merging" vertex="1">
+          <mxGeometry height="80" width="130" x="260" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-46" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="types/index.ts&#xa;&#xa;Review, SentimentResult,&#xa;ReviewMetadata, AnalyticsData,&#xa;ChatMessage, ReviewSession" vertex="1">
+          <mxGeometry height="80" width="200" x="410" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-47" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="ui/ (shadcn components)&#xa;&#xa;Reusable UI primitives&#xa;Button, Input, Card, etc." vertex="1">
+          <mxGeometry height="80" width="170" x="630" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-48" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="Recharts&#xa;&#xa;BarChart, PieChart&#xa;ResponsiveContainer&#xa;Custom dark styling" vertex="1">
+          <mxGeometry height="80" width="150" x="820" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-49" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="Tailwind CSS 4&#xa;&#xa;Glass cards (backdrop-blur)&#xa;Gradient backgrounds&#xa;Animations (fade, scale)" vertex="1">
+          <mxGeometry height="80" width="170" x="990" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-50" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=8;" value="Lucide React&#xa;&#xa;Icon library used&#xa;across all pages" vertex="1">
+          <mxGeometry height="80" width="130" x="1180" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-51" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#efebe9;strokeColor=#795548;dashed=1;arcSize=6;" value="" vertex="1">
+          <mxGeometry height="280" width="1450" x="60" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-52" parent="1" style="text;html=1;fontSize=14;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#795548;" value="Client-Side Data Flow" vertex="1">
+          <mxGeometry height="22" width="250" x="80" y="745" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-53" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7ccc8;strokeColor=#795548;fontSize=10;fontStyle=1;" value="IngestForm&#xa;submits" vertex="1">
+          <mxGeometry height="45" width="100" x="100" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-54" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7ccc8;strokeColor=#795548;fontSize=10;fontStyle=1;" value="POST /api/ingest&#xa;returns response" vertex="1">
+          <mxGeometry height="45" width="140" x="260" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-55" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#bcaaa4;strokeColor=#795548;fontSize=9;fontStyle=1;" value="sessionStorage&#xa;&#xa;• sessionId&#xa;• metadata&#xa;• reviews[]&#xa;• analytics" vertex="1">
+          <mxGeometry height="85" width="130" x="470" y="775" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-56" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7ccc8;strokeColor=#795548;fontSize=10;fontStyle=1;" value="Dashboard reads&#xa;from sessionStorage&#xa;on mount" vertex="1">
+          <mxGeometry height="45" width="150" x="670" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-57" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7ccc8;strokeColor=#795548;fontSize=10;fontStyle=1;" value="Props flow down to:&#xa;StatsCards, Charts,&#xa;ReviewCards, Chat" vertex="1">
+          <mxGeometry height="50" width="150" x="890" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-58" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7ccc8;strokeColor=#795548;fontSize=10;fontStyle=1;" value="ChatInterface sends&#xa;history + sessionData&#xa;via POST /api/chat" vertex="1">
+          <mxGeometry height="50" width="160" x="1110" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-59" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-53" style="rounded=1;strokeWidth=2;strokeColor=#795548;" target="4yPQKLUokWsIiz7AHZk4-54">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-60" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-54" style="rounded=1;strokeWidth=2;strokeColor=#795548;" target="4yPQKLUokWsIiz7AHZk4-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-61" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-55" style="rounded=1;strokeWidth=2;strokeColor=#795548;" target="4yPQKLUokWsIiz7AHZk4-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-62" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-56" style="rounded=1;strokeWidth=2;strokeColor=#795548;" target="4yPQKLUokWsIiz7AHZk4-57">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-63" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-57" style="rounded=1;strokeWidth=2;strokeColor=#795548;" target="4yPQKLUokWsIiz7AHZk4-58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-64" parent="1" style="text;html=1;fontSize=11;fontStyle=1;align=left;fillColor=none;strokeColor=none;fontColor=#795548;" value="Navigation Flow" vertex="1">
+          <mxGeometry height="20" width="150" x="100" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-65" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=10;fontStyle=1;" value="/ (Home)" vertex="1">
+          <mxGeometry height="35" width="100" x="100" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-66" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90caf9;strokeColor=#1565c0;fontSize=10;fontStyle=1;" value="/dashboard" vertex="1">
+          <mxGeometry height="35" width="110" x="310" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-67" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=10;fontStyle=1;" value="/chat" vertex="1">
+          <mxGeometry height="35" width="90" x="530" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-68" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-65" style="rounded=1;strokeWidth=2;strokeColor=#333;" target="4yPQKLUokWsIiz7AHZk4-66">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-69" connectable="0" parent="4yPQKLUokWsIiz7AHZk4-68" style="edgeLabel;html=1;fontSize=9;fillColor=none;" value="on successful ingest&#xa;(router.push)" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-70" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-66" style="rounded=1;strokeWidth=2;strokeColor=#333;" target="4yPQKLUokWsIiz7AHZk4-67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-71" connectable="0" parent="4yPQKLUokWsIiz7AHZk4-70" style="edgeLabel;html=1;fontSize=9;fillColor=none;" value="header nav or&#xa;full-page chat" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-72" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f57f17;fontSize=9;align=left;spacingLeft=10;fontStyle=2;" value="State Management: No global state library.&#xa;sessionStorage for persistence across pages.&#xa;React useState/useEffect for local component state.&#xa;Chat history maintained in ChatInterface state." vertex="1">
+          <mxGeometry height="70" width="320" x="750" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-73" edge="1" parent="1" source="4yPQKLUokWsIiz7AHZk4-25" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;dashed=1;" target="4yPQKLUokWsIiz7AHZk4-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4yPQKLUokWsIiz7AHZk4-74" connectable="0" parent="4yPQKLUokWsIiz7AHZk4-73" style="edgeLabel;html=1;fontSize=8;fillColor=none;" value="opens" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

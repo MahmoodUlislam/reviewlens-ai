@@ -202,6 +202,18 @@ This file contains **20 realistic reviews** for a fictional "ProBass X500 Wirele
 5. **Apify free tier** — 5 USD/month compute credit is sufficient for demo and evaluation
 6. **English reviews only** — Comprehend sentiment analysis configured for English
 
+## Architecture Diagrams
+
+Detailed draw.io diagrams are available in [`docs/diagrams/`](docs/diagrams/) — open them with the [draw.io VS Code extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) or at [app.diagrams.net](https://app.diagrams.net):
+
+| Diagram | File | Description |
+| ------- | ---- | ----------- |
+| Cloud Architecture | `cloud-architecture.drawio` | AWS services layout — Amplify, Bedrock, Comprehend, Apify, Vercel alternative |
+| App Architecture | `app-architecture.drawio` | Full 4-layer stack: Presentation → API → Service → External Services |
+| User Flow | `user-flow.drawio` | End-to-end user journey from ingestion to AI Q&A with guardrail checks |
+| Backend Structure | `backend-structure.drawio` | API routes, service modules, and external service connections |
+| Frontend Structure | `frontend-structure.drawio` | Pages, component hierarchy, data flow, and navigation |
+
 ## What I'd Do With More Time
 
 - **DynamoDB persistence** — Sessions survive server restarts

@@ -162,3 +162,14 @@ In production, the architecture would be significantly hardened:
 - Platform-agnostic ingestion pipeline: each platform gets a dedicated adapter/parser that normalizes reviews into a common schema (reviewer, rating, date, text, platform metadata)
 - Configurable platform registry — new platforms can be added without code changes by defining scraping/API rules in a configuration layer
 - Unified analytics across platforms: compare sentiment and themes for the same product across different review sources
+
+### Vision-Based Scraping (Alternative to Web Scraping)
+
+- Replace traditional web scraping and third-party scraping services (e.g., Apify) with a **vision-based approach** using a browser extension like **GoFullPage** (or similar) to capture full-page screenshots of review pages
+- Feed the captured screenshots into a **vision model** (e.g., Claude's vision capabilities via Bedrock) to extract structured review data (reviewer name, rating, date, review text) directly from the image
+- **Advantages over traditional scraping:**
+  - No dependency on DOM structure — immune to website layout changes that break CSS/XPath selectors
+  - No need for third-party scraping services or API costs
+  - Works on pages with heavy JavaScript rendering, anti-bot protections, or dynamic content that is difficult to scrape programmatically
+  - Simpler maintenance — no scraper code to update when platforms change their HTML
+- Could be implemented as a browser extension workflow: user navigates to review page → extension captures full-page screenshot → uploads image to ReviewLens → vision model extracts and normalizes review data

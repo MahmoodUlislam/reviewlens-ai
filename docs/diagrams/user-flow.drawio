@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net" modified="2026-03-19" agent="ReviewLens AI" version="24.0">
+  <diagram id="user-flow" name="User Flow Diagram">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="ReviewLens AI — User Flow Diagram" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="400" y="15" width="500" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- START -->
+        <mxCell id="start" value="User opens&#10;ReviewLens AI" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a237e;fontColor=#ffffff;strokeColor=#1a237e;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Home Page -->
+        <mxCell id="home" value="Home Page ( / )&#10;See hero + features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#3f51b5;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="150" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Input Method -->
+        <mxCell id="decision-input" value="Choose&#10;Input Method" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="310" width="150" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- URL Path -->
+        <mxCell id="select-platform" value="Select Platform&#10;(Amazon / Google Maps)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="290" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="enter-url" value="Enter Product URL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="360" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="scraping" value="Apify scrapes reviews&#10;(up to 100, ~2 min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc80;strokeColor=#e65100;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="420" width="170" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- CSV Path -->
+        <mxCell id="csv-upload" value="Upload CSV / Paste Data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#0288d1;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="290" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="csv-parse" value="Auto-detect headers&#10;Normalize ratings &amp; dates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b3e5fc;strokeColor=#0288d1;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="360" width="170" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Merge Point: Processing -->
+        <mxCell id="sentiment" value="Amazon Comprehend&#10;Sentiment Analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="520" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="compute" value="Compute Analytics&#10;(ratings, keywords, sentiment)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="600" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="store-session" value="Store session&#10;(server + sessionStorage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="680" width="200" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Dashboard -->
+        <mxCell id="dashboard" value="/dashboard" style="text;html=1;fontSize=14;fontStyle=1;align=center;fillColor=none;strokeColor=none;fontColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="370" y="770" width="120" height="25" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dash-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;dashed=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="60" y="800" width="900" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="stats" value="StatsCards&#10;&#10;• Total Reviews&#10;• Avg Rating&#10;• Positive %&#10;• Date Range" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="820" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="charts" value="Charts&#10;&#10;• Rating Distribution&#10;  (Bar Chart)&#10;• Sentiment Breakdown&#10;  (Donut Chart)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="240" y="820" width="170" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="keywords-cloud" value="Keywords Cloud&#10;&#10;Top 20 keywords&#10;sized by frequency" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="430" y="820" width="150" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="review-list" value="Review Cards&#10;&#10;• Star rating&#10;• Sentiment badge&#10;• Review text&#10;• Paginated (6/page)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="600" y="820" width="150" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="chat-btn" value="Chat Button&#10;(floating)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="840" width="110" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Chat Flow -->
+        <mxCell id="decision-chat" value="Open&#10;Chat?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="810" width="100" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="chat-drawer" value="ChatDrawer&#10;(slide-out panel)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="940" width="140" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="chat-full" value="/chat&#10;(full page)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="810" width="120" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ask-question" value="User asks question&#10;about reviews" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ce93d8;strokeColor=#7b1fa2;fontSize=10;fontStyle=1;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="940" width="160" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Guardrail Decision -->
+        <mxCell id="guard-check" value="In&#10;Scope?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="1030" width="100" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="blocked" value="Guardrail blocks&#10;response (red badge)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="1050" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="stream-response" value="Claude streams&#10;AI response (SSE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="1050" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="display-answer" value="Display markdown&#10;response to user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="1120" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Loop back -->
+        <mxCell id="ask-more" value="Ask another&#10;question?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="1140" width="90" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS -->
+        <mxCell id="f1" style="rounded=1;strokeWidth=2;strokeColor=#1a237e;" edge="1" source="start" target="home" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" style="rounded=1;strokeWidth=2;strokeColor=#3f51b5;" edge="1" source="home" target="decision-input" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- URL branch -->
+        <mxCell id="f3" style="rounded=1;strokeWidth=2;strokeColor=#f57f17;" edge="1" source="decision-input" target="select-platform" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3-label" value="URL" style="edgeLabel;html=1;fontSize=10;fontStyle=1;fillColor=#fff8e1;" vertex="1" connectable="0" parent="f3">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <mxCell id="f4" style="rounded=1;strokeWidth=1;strokeColor=#f57f17;" edge="1" source="select-platform" target="enter-url" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" style="rounded=1;strokeWidth=1;strokeColor=#e65100;" edge="1" source="enter-url" target="scraping" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f6" style="rounded=1;strokeWidth=2;strokeColor=#e65100;" edge="1" source="scraping" target="sentiment" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- CSV branch -->
+        <mxCell id="f7" style="rounded=1;strokeWidth=2;strokeColor=#0288d1;" edge="1" source="decision-input" target="csv-upload" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f7-label" value="CSV" style="edgeLabel;html=1;fontSize=10;fontStyle=1;fillColor=#e1f5fe;" vertex="1" connectable="0" parent="f7">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <mxCell id="f8" style="rounded=1;strokeWidth=1;strokeColor=#0288d1;" edge="1" source="csv-upload" target="csv-parse" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f9" style="rounded=1;strokeWidth=2;strokeColor=#0288d1;" edge="1" source="csv-parse" target="sentiment" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Processing flow -->
+        <mxCell id="f10" style="rounded=1;strokeWidth=2;strokeColor=#283593;" edge="1" source="sentiment" target="compute" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f11" style="rounded=1;strokeWidth=2;strokeColor=#283593;" edge="1" source="compute" target="store-session" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f12" style="rounded=1;strokeWidth=2;strokeColor=#2e7d32;" edge="1" source="store-session" target="dashboard" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f12b" style="rounded=1;strokeWidth=2;strokeColor=#2e7d32;" edge="1" source="dashboard" target="dash-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Chat flow -->
+        <mxCell id="f13" style="rounded=1;strokeWidth=2;strokeColor=#7b1fa2;" edge="1" source="chat-btn" target="decision-chat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f14" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" source="decision-chat" target="chat-drawer" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f14-label" value="Drawer" style="edgeLabel;html=1;fontSize=9;fillColor=#f3e5f5;" vertex="1" connectable="0" parent="f14">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="f15" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" source="decision-chat" target="chat-full" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f15-label" value="Full Page" style="edgeLabel;html=1;fontSize=9;fillColor=#f3e5f5;" vertex="1" connectable="0" parent="f15">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <mxCell id="f16" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" source="chat-drawer" target="ask-question" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f17" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" source="chat-full" target="ask-question" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Guardrail check -->
+        <mxCell id="f18" style="rounded=1;strokeWidth=2;strokeColor=#c62828;" edge="1" source="ask-question" target="guard-check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f19" style="rounded=1;strokeWidth=1;strokeColor=#c62828;" edge="1" source="guard-check" target="blocked" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f19-label" value="No" style="edgeLabel;html=1;fontSize=10;fontStyle=1;fontColor=#c62828;fillColor=none;" vertex="1" connectable="0" parent="f19">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="f20" style="rounded=1;strokeWidth=2;strokeColor=#2e7d32;" edge="1" source="guard-check" target="stream-response" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f20-label" value="Yes" style="edgeLabel;html=1;fontSize=10;fontStyle=1;fontColor=#2e7d32;fillColor=none;" vertex="1" connectable="0" parent="f20">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="f21" style="rounded=1;strokeWidth=1;strokeColor=#2e7d32;" edge="1" source="stream-response" target="display-answer" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f22" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" source="display-answer" target="ask-more" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Loop back to ask question -->
+        <mxCell id="f23" style="rounded=1;strokeWidth=1;strokeColor=#7b1fa2;curved=1;" edge="1" source="ask-more" target="ask-question" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1420" y="1175" />
+              <mxPoint x="1420" y="962" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f23-label" value="Yes" style="edgeLabel;html=1;fontSize=9;fontStyle=1;fillColor=none;fontColor=#7b1fa2;" vertex="1" connectable="0" parent="f23">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
