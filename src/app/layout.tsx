@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "ReviewLens AI — Review Intelligence Portal",
   description:
     "Ingest, analyze, and interrogate product reviews with AI-powered guardrailed Q&A. Built with Amazon Bedrock.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { parseCSV } from "@/lib/csv-parser";
+import { parseCSVDetailed, ColumnMapping } from "@/lib/csv-parser";
 import { analyzeSentiment } from "@/lib/comprehend";
 import { computeAnalytics } from "@/lib/analytics";
 import { setSession } from "@/lib/store";
-import { scrapeAmazonReviews } from "@/lib/scraper";
+import { scrapeReviews } from "@/lib/scraper";
 import { Review, ReviewMetadata, ReviewSession } from "@/types";
 
 export async function POST(request: NextRequest) {
@@ -17,28 +17,46 @@ export async function POST(request: NextRequest) {
     let productUrl = url || "";
     let overallRating: number | undefined;
     let totalGlobalRatings: number | undefined;
+    let csvWarnings: string[] = [];
+    let csvMapping: ColumnMapping | undefined;
 
     if (type === "url" && url) {
       try {
-        const result = await scrapeAmazonReviews(url);
+        const result = await scrapeReviews(platform, url);
         reviews = result.reviews;
         productName = result.productName;
         overallRating = result.overallRating;
         totalGlobalRatings = result.totalGlobalRatings;
       } catch (scrapeError) {
         console.warn("Scrape failed:", scrapeError);
+        const message = scrapeError instanceof Error ? scrapeError.message : "Automated scraping failed.";
         return NextResponse.json(
           {
             success: false,
-            error:
-              "Automated scraping failed. This can happen due to anti-bot measures. Please use CSV upload instead — it works reliably every time.",
+            error: message + " You can also try CSV upload instead.",
           },
           { status: 400 }
         );
       }
     } else if (type === "csv" && csvData) {
-      reviews = parseCSV(csvData);
+      const csvResult = parseCSVDetailed(csvData);
+      reviews = csvResult.reviews;
+      csvWarnings = csvResult.warnings;
+      csvMapping = csvResult.mapping;
       productName = body.productName || "Uploaded Product";
+
+      if (reviews.length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: csvWarnings.length > 0
+              ? csvWarnings.join(" ")
+              : "No reviews could be extracted. Please check your CSV format.",
+            columnMapping: csvMapping,
+          },
+          { status: 400 }
+        );
+      }
     } else {
       return NextResponse.json(
         { success: false, error: "Invalid request. Provide URL or CSV data." },
@@ -100,6 +118,7 @@ export async function POST(request: NextRequest) {
       reviews: enrichedReviews,
       analytics,
       reviewCount: enrichedReviews.length,
+      ...(csvMapping && { columnMapping: csvMapping, csvWarnings }),
     });
   } catch (error) {
     console.error("Ingest error:", error);

@@ -36,7 +36,7 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
       gradient: "from-amber-500 to-orange-600",
       glow: "shadow-amber-500/20",
       suffix: metadata.totalGlobalRatings
-        ? `/ 5 · ${metadata.totalGlobalRatings.toLocaleString()} ratings`
+        ? `/ 5 · ${metadata.totalGlobalRatings.toLocaleString()} ${metadata.platform === "Amazon" ? "global ratings" : "reviews"}`
         : "/ 5",
     },
     {

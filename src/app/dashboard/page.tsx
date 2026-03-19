@@ -130,7 +130,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {displayedReviews.map((review, i) => (
-              <ReviewCard key={review.id} review={review} index={i} />
+              <ReviewCard key={review.id} review={review} index={i} platform={metadata.platform} />
             ))}
           </div>
         </div>

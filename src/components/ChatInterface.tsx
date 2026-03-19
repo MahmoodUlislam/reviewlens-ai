@@ -273,18 +273,26 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
                 )}>
                   {msg.content ? (
                     msg.role === "assistant" ? (
-                      <div className="chat-markdown">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
+                      <>
+                        <div className="chat-markdown">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                        {isStreaming && msg.id === messages[messages.length - 1]?.id && (
+                          <div className="flex items-center justify-end gap-1 mt-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce [animation-delay:0ms]" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce [animation-delay:150ms]" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce [animation-delay:300ms]" />
+                          </div>
+                        )}
+                      </>
                     ) : (
                       msg.content
                     )
                   ) : (
                     isStreaming && msg.role === "assistant" ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse delay-100" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse delay-200" />
+                      <div className="flex items-center gap-2 py-1">
+                        <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
+                        <span className="text-xs text-violet-300/70 animate-pulse">Analyzing reviews...</span>
                       </div>
                     ) : null
                   )}

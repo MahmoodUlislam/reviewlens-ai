@@ -3,30 +3,19 @@ import { v4 as uuidv4 } from "uuid";
 
 const APIFY_BASE_URL = "https://api.apify.com/v2";
 
-// Apify actor IDs for different platforms
 const ACTOR_IDS: Record<string, string> = {
   Amazon: "junglee~amazon-reviews-scraper",
-  "Google Maps": "compass~crawler-google-places",
+  "Google Maps": "compass~google-maps-reviews-scraper",
 };
 
-interface ApifyAmazonReview {
-  reviewTitle?: string;
-  reviewBody?: string;
-  ratingScore?: number;
-  reviewedIn?: string;
-  reviewerName?: string;
-  isVerified?: boolean;
-  date?: string;
-  // Alternative field names
-  title?: string;
-  body?: string;
-  text?: string;
-  rating?: number;
-  stars?: number;
-  author?: string;
-  name?: string;
-  verified?: boolean;
+export interface ScrapeResult {
+  reviews: Review[];
+  productName: string;
+  overallRating?: number;
+  totalGlobalRatings?: number;
 }
+
+// --- Shared Apify helpers ---
 
 interface ApifyRunResponse {
   data: {
@@ -34,10 +23,6 @@ interface ApifyRunResponse {
     status: string;
     defaultDatasetId: string;
   };
-}
-
-interface ApifyDatasetResponse {
-  items: ApifyAmazonReview[];
 }
 
 async function apifyFetch(path: string, options?: RequestInit): Promise<Response> {
@@ -63,6 +48,54 @@ async function waitForRun(runId: string, actorId: string, timeoutMs = 120000): P
   throw new Error("Apify run timed out");
 }
 
+async function startAndCollect(actorId: string, input: Record<string, unknown>): Promise<unknown[]> {
+  const startRes = await apifyFetch(`/acts/${actorId}/runs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  if (!startRes.ok) {
+    const err = await startRes.text();
+    throw new Error(`Failed to start Apify actor: ${err}`);
+  }
+
+  const startData = (await startRes.json()) as ApifyRunResponse;
+  const run = await waitForRun(startData.data.id, actorId);
+
+  const datasetRes = await apifyFetch(`/datasets/${run.defaultDatasetId}/items?format=json`);
+  if (!datasetRes.ok) {
+    throw new Error("Failed to fetch Apify dataset results");
+  }
+
+  const items = (await datasetRes.json()) as unknown[];
+  if (!items || items.length === 0) {
+    throw new Error("No reviews found. The page may have no reviews or the scraper couldn't access them.");
+  }
+
+  return items;
+}
+
+// --- Amazon ---
+
+interface ApifyAmazonReview {
+  reviewTitle?: string;
+  reviewBody?: string;
+  ratingScore?: number;
+  reviewedIn?: string;
+  reviewerName?: string;
+  isVerified?: boolean;
+  date?: string;
+  title?: string;
+  body?: string;
+  text?: string;
+  rating?: number;
+  stars?: number;
+  author?: string;
+  name?: string;
+  verified?: boolean;
+}
+
 async function scrapeOverallRating(asin: string): Promise<{ overallRating?: number; totalGlobalRatings?: number; productName?: string }> {
   try {
     const res = await fetch(`https://www.amazon.com/dp/${asin}`, {
@@ -73,15 +106,12 @@ async function scrapeOverallRating(asin: string): Promise<{ overallRating?: numb
     });
     const html = await res.text();
 
-    // Extract overall rating: "4.7 out of 5 stars"
     const ratingMatch = html.match(/(\d+\.?\d*)\s+out of\s+5\s+stars/);
     const overallRating = ratingMatch ? parseFloat(ratingMatch[1]) : undefined;
 
-    // Extract total ratings: "27,405 global ratings"
     const totalMatch = html.match(/([\d,]+)\s+global\s+ratings/);
     const totalGlobalRatings = totalMatch ? parseInt(totalMatch[1].replace(/,/g, ""), 10) : undefined;
 
-    // Extract product name from title tag
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     let productName: string | undefined;
     if (titleMatch) {
@@ -97,13 +127,7 @@ async function scrapeOverallRating(asin: string): Promise<{ overallRating?: numb
   }
 }
 
-export async function scrapeAmazonReviews(url: string): Promise<{
-  reviews: Review[];
-  productName: string;
-  overallRating?: number;
-  totalGlobalRatings?: number;
-}> {
-  // Extract ASIN from URL
+export async function scrapeAmazonReviews(url: string): Promise<ScrapeResult> {
   const asinMatch = url.match(/\/(?:dp|gp\/product|product-reviews)\/([A-Z0-9]{10})/);
   if (!asinMatch) {
     throw new Error("Could not extract Amazon product ID (ASIN) from URL. Please ensure it's a valid Amazon product URL.");
@@ -112,41 +136,14 @@ export async function scrapeAmazonReviews(url: string): Promise<{
   const asin = asinMatch[1];
   const actorId = ACTOR_IDS.Amazon;
 
-  // Fetch overall product rating in parallel with Apify scrape
   const overallPromise = scrapeOverallRating(asin);
 
-  // Start the Apify actor run via REST API
-  const startRes = await apifyFetch(`/acts/${actorId}/runs`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      productUrls: [{ url: `https://www.amazon.com/dp/${asin}` }],
-      maxReviews: 100,
-      sort: "recent",
-    }),
-  });
+  const items = (await startAndCollect(actorId, {
+    productUrls: [{ url: `https://www.amazon.com/dp/${asin}` }],
+    maxReviews: 100,
+    sort: "recent",
+  })) as ApifyAmazonReview[];
 
-  if (!startRes.ok) {
-    const err = await startRes.text();
-    throw new Error(`Failed to start Apify actor: ${err}`);
-  }
-
-  const startData = (await startRes.json()) as ApifyRunResponse;
-  const run = await waitForRun(startData.data.id, actorId);
-
-  // Fetch results from the dataset
-  const datasetRes = await apifyFetch(`/datasets/${run.defaultDatasetId}/items?format=json`);
-  if (!datasetRes.ok) {
-    throw new Error("Failed to fetch Apify dataset results");
-  }
-
-  const items = (await datasetRes.json()) as ApifyAmazonReview[];
-
-  if (!items || items.length === 0) {
-    throw new Error("No reviews found. The product may have no reviews or the scraper couldn't access them.");
-  }
-
-  // Transform Apify output to our Review format
   const reviews: Review[] = items.map((item) => ({
     id: uuidv4(),
     rating: item.ratingScore || item.rating || item.stars || 0,
@@ -157,7 +154,6 @@ export async function scrapeAmazonReviews(url: string): Promise<{
     verified: item.isVerified ?? item.verified ?? false,
   })).filter((r) => r.body || r.title);
 
-  // Get overall rating results
   const overall = await overallPromise;
   const productName = overall.productName || "Amazon Product " + asin;
 
@@ -167,4 +163,68 @@ export async function scrapeAmazonReviews(url: string): Promise<{
     overallRating: overall.overallRating,
     totalGlobalRatings: overall.totalGlobalRatings,
   };
+}
+
+// --- Google Maps ---
+
+interface ApifyGoogleMapsReview {
+  text?: string;
+  textTranslated?: string;
+  stars?: number;
+  publishedAtDate?: string;
+  reviewerName?: string;
+  isLocalGuide?: boolean;
+}
+
+export async function scrapeGoogleMapsReviews(url: string): Promise<ScrapeResult> {
+  if (!url.includes("google.com/maps") && !url.includes("maps.app.goo.gl")) {
+    throw new Error("Please provide a valid Google Maps URL.");
+  }
+
+  const actorId = ACTOR_IDS["Google Maps"];
+
+  const items = (await startAndCollect(actorId, {
+    startUrls: [{ url }],
+    maxReviews: 100,
+    reviewsSort: "newest",
+    language: "en",
+    scrapeReviewerName: true,
+  })) as ApifyGoogleMapsReview[];
+
+  const reviews: Review[] = items.map((item) => ({
+    id: uuidv4(),
+    rating: item.stars || 0,
+    title: "",
+    body: (item.textTranslated || item.text || "").trim(),
+    date: item.publishedAtDate ? new Date(item.publishedAtDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "",
+    reviewer: (item.reviewerName || "Anonymous").trim(),
+    verified: item.isLocalGuide ?? false,
+  })).filter((r) => r.body);
+
+  // Extract place name from URL
+  const nameMatch = url.match(/\/place\/([^/@]+)/);
+  const productName = nameMatch ? decodeURIComponent(nameMatch[1]).replace(/\+/g, " ") : "Google Maps Place";
+
+  const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+  const overallRating = reviews.length > 0 ? Math.round((totalRating / reviews.length) * 10) / 10 : undefined;
+
+  return {
+    reviews,
+    productName,
+    overallRating,
+    totalGlobalRatings: reviews.length,
+  };
+}
+
+// --- Platform dispatcher ---
+
+export async function scrapeReviews(platform: string, url: string): Promise<ScrapeResult> {
+  switch (platform) {
+    case "Amazon":
+      return scrapeAmazonReviews(url);
+    case "Google Maps":
+      return scrapeGoogleMapsReviews(url);
+    default:
+      throw new Error(`URL scraping is not supported for ${platform}. Please use CSV upload.`);
+  }
 }

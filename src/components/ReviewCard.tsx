@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface ReviewCardProps {
   review: Review;
   index: number;
+  platform?: string;
 }
 
 const sentimentConfig = {
@@ -32,7 +33,7 @@ const sentimentConfig = {
   },
 };
 
-export default function ReviewCard({ review, index }: ReviewCardProps) {
+export default function ReviewCard({ review, index, platform }: ReviewCardProps) {
   const sentiment = review.sentiment?.label;
   const config = sentiment ? sentimentConfig[sentiment] : null;
 
@@ -94,7 +95,7 @@ export default function ReviewCard({ review, index }: ReviewCardProps) {
             {review.verified && (
               <span className="flex items-center gap-1 text-emerald-400/60">
                 <CheckCircle2 className="w-3 h-3" />
-                Verified
+                {platform === "Google Maps" ? "Local Guide" : "Verified"}
               </span>
             )}
             {review.date && <span>{review.date}</span>}

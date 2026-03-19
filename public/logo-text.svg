@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 120" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="820" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="icon-bg" x1="10" y1="15" x2="100" y2="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <clipPath id="icon-clip">
+      <rect x="10" y="15" width="90" height="90" rx="20"/>
+    </clipPath>
+  </defs>
+
+  <!-- Icon container -->
+  <rect x="10" y="15" width="90" height="90" rx="20" fill="url(#icon-bg)"/>
+
+  <!-- Magnifying glass (scaled to icon) -->
+  <g clip-path="url(#icon-clip)">
+    <circle cx="49" cy="51" r="18" stroke="white" stroke-width="5" fill="rgba(255,255,255,0.06)"/>
+    <!-- Star inside lens -->
+    <path d="M49 38 L52.1 47.5 L62.2 47.5 L54 53.4 L57.1 62.9 L49 57.2 L40.9 62.9 L44 53.4 L35.8 47.5 L45.9 47.5 Z" fill="white" opacity="0.88"/>
+    <!-- Handle -->
+    <line x1="62" y1="64" x2="78" y2="80" stroke="white" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- "Review" text -->
+  <text x="120" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="#f0f0ff">Review</text>
+  <!-- "Lens" text with gradient -->
+  <text x="400" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="url(#grad)">Lens</text>
+  <!-- "AI" text -->
+  <text x="618" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="40" font-weight="500" fill="#8b5cf6" opacity="0.7">AI</text>
+</svg>

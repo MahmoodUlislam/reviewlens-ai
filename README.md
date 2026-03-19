@@ -1,6 +1,6 @@
 # ReviewLens AI — Review Intelligence Portal
 
-A secure, web-based portal that ingests product reviews from Amazon and enables analysts to interrogate that data through a **guardrailed AI Q&A interface** — without the AI ever drifting off-topic.
+A secure, web-based portal that ingests product reviews from **Amazon, Google Maps, and Yelp** and enables analysts to interrogate that data through a **guardrailed AI Q&A interface** — without the AI ever drifting off-topic. The platform-agnostic architecture is designed to expand to additional review sources in the future.
 
 **Live URL:** _[deployed URL here]_
 
@@ -17,13 +17,13 @@ A secure, web-based portal that ingests product reviews from Amazon and enables 
 │   │  Ingest     │   │ Dashboard    │   │  Q&A Chat        │   │
 │   │  URL+CSV    │   │ Stats+Charts │   │  Streaming Drawer│   │
 │   └─────┬───────┘   └──────┬───────┘   └────────┬─────────┘   │
-│         │                │                     │              │
-│   ┌─────▼────────────────▼─────────────────────▼───────────┐  │
+│         │                  │                    │             │
+│   ┌─────▼──────────────────▼────────────────────▼──────────┐  │
 │   │                Next.js API Routes                      │  │
 │   │  POST /api/ingest  — scrape via Apify or parse CSV     │  │
 │   │  POST /api/chat    — guardrailed Q&A (SSE streaming)   │  │
-│   └───┬──────────────────────────────┬─────────────────────┘  │
-│       │                              │                        │
+│   └───┬───────────────────────────────┬────────────────────┘  │
+│       │                               │                       │
 │  ┌────▼───────────┐    ┌──────────────▼───────────────────┐   │
 │  │ Scraper        │    │ Amazon Bedrock                   │   │
 │  │ Apify REST API │    │ ┌──────────────────────────┐     │   │
@@ -44,21 +44,21 @@ A secure, web-based portal that ingests product reviews from Amazon and enables 
 
 ## Tech Stack
 
-| Layer              | Technology                                        |
-| ------------------ | ------------------------------------------------- |
-| Framework          | Next.js 16.2 (App Router, TypeScript, Turbopack)  |
-| Styling            | Tailwind CSS v4 + shadcn/ui                       |
-| LLM                | Amazon Bedrock — Claude Opus 4.6                  |
-| Scope Guard L1     | Amazon Bedrock Guardrails (denied topic policies) |
-| Scope Guard L2     | System prompt engineering                         |
-| Sentiment Analysis | Amazon Comprehend (BatchDetectSentiment)          |
-| Scraping           | Apify REST API (Amazon Reviews Scraper)           |
-| Overall Rating     | Direct product page fetch + regex extraction      |
-| Import (fallback)  | CSV upload / paste                                |
-| Charts             | Recharts                                          |
-| Chat Rendering     | react-markdown with custom theme                  |
-| Storage            | sessionStorage (client-side)                      |
-| Deployment         | AWS Amplify                                       |
+| Layer              | Technology                                            |
+| ------------------ | ----------------------------------------------------- |
+| Framework          | Next.js 16.2 (App Router, TypeScript, Turbopack)      |
+| Styling            | Tailwind CSS v4 + shadcn/ui                           |
+| LLM                | Amazon Bedrock — Claude Opus 4.6                      |
+| Scope Guard L1     | Amazon Bedrock Guardrails (denied topic policies)     |
+| Scope Guard L2     | System prompt engineering                             |
+| Sentiment Analysis | Amazon Comprehend (BatchDetectSentiment)              |
+| Scraping           | Apify REST API (Amazon, Google Maps, Yelp)            |
+| Overall Rating     | Direct product page fetch + regex extraction (Amazon) |
+| Import (fallback)  | CSV upload / paste                                    |
+| Charts             | Recharts                                              |
+| Chat Rendering     | react-markdown with custom theme                      |
+| Storage            | sessionStorage (client-side)                          |
+| Deployment         | AWS Amplify                                           |
 
 ## Key Design Decision: Dual-Layer Scope Guard
 
@@ -84,7 +84,11 @@ This is how you'd build scope enforcement in production — infrastructure-level
 
 Two-tier approach:
 
-1. **Apify REST API** (primary) — Pre-built Amazon Reviews Scraper actor (`junglee~amazon-reviews-scraper`), handles anti-bot, pagination, proxy rotation. Called via REST API directly (no SDK — avoids Turbopack dynamic import issues). Overall product rating and total global ratings are scraped in parallel from the product page.
+1. **Apify REST API** (primary) — Platform-specific scrapers via Apify actors, called through a unified REST API dispatcher. Each platform has its own actor and field mapping:
+   - **Amazon** — `junglee~amazon-reviews-scraper` + parallel product page fetch for overall rating/global ratings
+   - **Google Maps** — `compass~google-maps-reviews-scraper` with Local Guide detection
+   - **Yelp** — `yin~yelp-scraper` with business URL parsing
+   - The architecture is designed to be **easily extensible** — adding a new platform requires only a new actor ID, field mapping function, and URL validator in `scraper.ts`.
 2. **CSV Upload** (always works) — User pastes or uploads review data directly. Supports flexible column names.
 
 ## Getting Started
@@ -132,9 +136,66 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+### Run Tests
+
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode (re-runs on file changes)
+npm run test:watch
+```
+
+Test suites cover the core business logic:
+
+| Suite        | What it tests                                                                                                                |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `csv-parser` | Auto-detection of arbitrary column names, rating scale normalization, date parsing, empty row filtering, whitespace trimming |
+| `analytics`  | Rating distribution, averages, sentiment breakdown, keyword extraction                                                       |
+| `prompts`    | System prompt construction, scope guard rules, decline template                                                              |
+| `store`      | Session CRUD, existence checks, overwrite behavior                                                                           |
+
+### Testing CSV Upload with Example Data
+
+The repo includes sample review data for testing the "Other Platform" CSV upload flow:
+
+```text
+src/__tests__/data/shopify-headphones-reviews.csv
+```
+
+This file contains **20 realistic reviews** for a fictional "ProBass X500 Wireless Headphones" product. It intentionally uses **non-standard column names** to validate the auto-detection engine:
+
+| CSV Column          | Auto-detected as |
+| ------------------- | ---------------- |
+| `product_name`      | _(ignored)_      |
+| `star_rating`       | `rating`         |
+| `review_title`      | `title`          |
+| `customer_feedback` | `body`           |
+| `purchase_date`     | `date`           |
+| `customer_name`     | `reviewer`       |
+| `verified_purchase` | `verified`       |
+
+**To test manually:**
+
+1. Start the dev server: `npm run dev`
+2. Open `http://localhost:3000`
+3. Select **"Other Platform"** from the platform dropdown
+4. Drag and drop `src/__tests__/data/shopify-headphones-reviews.csv` onto the upload zone (or click to browse)
+5. Enter a product name (e.g., "ProBass X500 Wireless Headphones")
+6. Click **Upload & Analyze**
+7. Verify the dashboard shows all 20 reviews with correct ratings (1–5), dates, sentiment analysis, and reviewer names
+
+**What the auto-detection engine handles:**
+
+- **Arbitrary column names** — Headers like `star_rating`, `customer_feedback`, `user_name`, `comment`, etc. are matched via fuzzy keyword matching + content analysis
+- **Any rating scale** — 5-point, 10-point, or 100-point scales are detected and normalized to 1–5
+- **Mixed date formats** — `2024-01-15`, `Jan 15, 2024`, `15/01/2024`, ISO 8601 are all normalized to `YYYY-MM-DD`
+- **Missing columns** — If a column can't be detected (e.g., no reviewer column), sensible defaults are applied (`"Anonymous"`, `false`, etc.)
+- **Empty rows** — Rows with no review text are filtered out with a warning
+
 ## Assumptions
 
-1. **Amazon as target platform** — Most structured review data, well-supported by Apify scraper
+1. **Three platforms currently supported** — Amazon, Google Maps, and Yelp via Apify scrapers; additional platforms (G2, Capterra, Trustpilot, etc.) can be added by extending the scraper dispatcher
 2. **Client-side storage** — sessionStorage for prototype; production would use DynamoDB
 3. **No user authentication** — Per assignment requirements, the app is directly accessible
 4. **Bedrock costs** — Claude Opus 4.6 pay-per-token; total demo cost < $1
@@ -145,6 +206,7 @@ npm run dev
 
 - **DynamoDB persistence** — Sessions survive server restarts
 - **Bedrock Agent + Knowledge Base** — RAG for 10,000+ reviews beyond context window limits
+- **More review platforms** — G2, Capterra, Trustpilot, TripAdvisor (architecture already supports plug-in scrapers)
 - **Multi-product comparison** — Compare sentiment across products
 - **PDF/CSV export** — Download analysis reports
 - **Rate limiting** — Protect the Bedrock API from abuse

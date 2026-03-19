@@ -12,6 +12,12 @@ For this prototype, ReviewLens AI uses **direct LLM invocation via Amazon Bedroc
 
 This is sufficient and performant for the prototype's review volume. The following improvements would be necessary for a production-scale system.
 
+### Deployment: AWS Amplify
+
+The Next.js application is deployed using **AWS Amplify Hosting**. Amplify was chosen because it keeps the entire stack within a single AWS cloud infrastructure — the frontend, Bedrock, Comprehend, and all future services (Cognito, DynamoDB, S3, API Gateway) live under one AWS account. This simplifies IAM permissions, networking, billing, and is recommended when the goal is a unified AWS-native architecture with a clear path to production-grade security and authentication (e.g., Cognito + Amplify Auth, VPC endpoints, WAF).
+
+**Alternative:** Vercel can also be used to deploy the Next.js application. Vercel offers an excellent developer experience with zero-config deployments, edge functions, and built-in analytics. It is a viable option especially if the team prefers a managed frontend platform decoupled from AWS infrastructure.
+
 ---
 
 ## Phase 1: Amazon Bedrock Agent Architecture
@@ -138,3 +144,21 @@ In production, the architecture would be significantly hardened:
 - CloudFront caching for static dashboard data
 - Lambda reserved concurrency for scraper to prevent cold starts
 - S3 Intelligent-Tiering for archived review data
+
+---
+
+## Phase 5: Real-Time Streaming & Multi-Platform Support
+
+### WebSocket for Real-Time Chat Streaming
+
+- Replace HTTP-based streaming with **WebSocket connections** (via API Gateway WebSocket API or ALB) for real-time chat response streaming
+- Enables true bidirectional communication — the server pushes tokens as they are generated, reducing perceived latency and improving UX
+- Benefits: lower overhead per message compared to HTTP streaming, persistent connection avoids repeated TLS handshakes, and enables server-initiated updates (e.g., progress indicators during long analyses)
+- Implementation: API Gateway WebSocket API → Lambda (connect/disconnect/message handlers) → Bedrock ConverseStream, with DynamoDB for connection state management
+
+### Multi-Platform Review Ingestion
+
+- Extend review ingestion beyond the current supported platforms to handle additional sources based on business needs (e.g., Google Play, App Store, Trustpilot, G2, Capterra, Yelp)
+- Platform-agnostic ingestion pipeline: each platform gets a dedicated adapter/parser that normalizes reviews into a common schema (reviewer, rating, date, text, platform metadata)
+- Configurable platform registry — new platforms can be added without code changes by defining scraping/API rules in a configuration layer
+- Unified analytics across platforms: compare sentiment and themes for the same product across different review sources
