@@ -2,6 +2,7 @@
 
 import { Star, MessageSquare, Calendar, TrendingUp } from "lucide-react";
 import { ReviewMetadata, AnalyticsData } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface StatsCardsProps {
   metadata: ReviewMetadata;
@@ -50,14 +51,10 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
       value:
         metadata.dateRange.earliest === "Unknown"
           ? "N/A"
-          : metadata.dateRange.earliest.slice(0, 10),
+          : `${metadata.dateRange.earliest.slice(0, 10)} — ${metadata.dateRange.latest !== "Unknown" ? metadata.dateRange.latest.slice(0, 10) : "Present"}`,
       icon: Calendar,
       gradient: "from-cyan-500 to-blue-600",
       glow: "shadow-cyan-500/20",
-      suffix:
-        metadata.dateRange.latest !== "Unknown"
-          ? ` — ${metadata.dateRange.latest.slice(0, 10)}`
-          : "",
     },
   ];
 
@@ -81,7 +78,10 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
                 <p className="text-xs text-white/40 uppercase tracking-wider">
                   {stat.label}
                 </p>
-                <p className="text-2xl font-bold text-white/90">
+                <p className={cn(
+                  "font-bold text-white/90 whitespace-nowrap",
+                  stat.value.length > 15 ? "text-sm" : stat.value.length > 10 ? "text-lg" : "text-2xl"
+                )}>
                   {stat.value}
                   {stat.suffix && (
                     <span className="text-sm font-normal text-white/30 ml-1">

@@ -16,7 +16,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center mb-14 relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-violet-300 mb-6 animate-fade-up">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Powered by Amazon Bedrock &amp; Guardrails
+              Amazon Bedrock &middot; Comprehend &middot; Apify &middot; Next.js 16
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-up delay-100" style={{ animationFillMode: 'backwards' }}>
@@ -42,28 +42,28 @@ export default function Home() {
               {
                 icon: Zap,
                 title: "Instant Ingestion",
-                desc: "Scrape reviews from Amazon or upload CSV data in seconds",
+                desc: "Scrape Amazon reviews via Apify or upload CSV — with real overall rating from product page",
                 glow: "glow-purple",
                 iconBg: "from-violet-500 to-purple-600",
               },
               {
                 icon: BarChart3,
                 title: "Smart Analytics",
-                desc: "Rating distribution, sentiment analysis via AWS Comprehend",
+                desc: "Rating distribution, keyword cloud, and NLP sentiment analysis powered by Amazon Comprehend",
                 glow: "glow-blue",
                 iconBg: "from-indigo-500 to-blue-600",
               },
               {
                 icon: MessageSquare,
-                title: "AI Q&A",
-                desc: "Ask questions about reviews with cited, data-backed answers",
+                title: "Streaming AI Q&A",
+                desc: "Ask questions in a slide-out chat — streamed responses with markdown rendering and review citations",
                 glow: "glow-cyan",
                 iconBg: "from-cyan-500 to-teal-600",
               },
               {
                 icon: Shield,
                 title: "Dual Scope Guard",
-                desc: "Bedrock Guardrails + system prompt — never drifts off-topic",
+                desc: "Bedrock Guardrails + system prompt enforce review-only scope — out-of-scope queries are blocked",
                 glow: "glow-green",
                 iconBg: "from-emerald-500 to-green-600",
               },
@@ -91,9 +91,12 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="border-t border-white/5 py-8 text-center">
+        <footer className="border-t border-white/5 py-8 text-center space-y-1">
           <p className="text-xs text-white/30">
             Built with Next.js 16 &middot; Amazon Bedrock &middot; Bedrock Guardrails &middot; Amazon Comprehend
+          </p>
+          <p className="text-xs text-white/20">
+            Powered by <span className="text-violet-400/60 font-medium">Mahmood</span>
           </p>
         </footer>
       </main>
