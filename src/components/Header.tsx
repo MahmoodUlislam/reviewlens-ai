@@ -15,15 +15,16 @@ export default function Header() {
   ];
 
   return (
-    <header className="border-b bg-card">
+    <header className="sticky top-0 z-50 glass-strong">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Search className="w-4 h-4 text-primary-foreground" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
+              <Search className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              ReviewLens<span className="text-primary/70"> AI</span>
+              Review<span className="gradient-text">Lens</span>
+              <span className="text-violet-400/70 ml-0.5 text-sm font-medium">AI</span>
             </span>
           </Link>
 
@@ -36,10 +37,10 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-gradient-to-r from-violet-500/20 to-indigo-500/20 text-violet-300 border border-violet-500/20 shadow-lg shadow-violet-500/10"
+                      : "text-white/50 hover:text-white/80 hover:bg-white/5"
                   )}
                 >
                   <Icon className="w-4 h-4" />

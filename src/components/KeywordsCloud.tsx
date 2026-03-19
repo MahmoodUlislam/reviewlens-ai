@@ -1,8 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
 interface KeywordsCloudProps {
   keywords: { word: string; count: number }[];
 }
@@ -12,32 +9,27 @@ export default function KeywordsCloud({ keywords }: KeywordsCloudProps) {
 
   const maxCount = keywords[0]?.count || 1;
 
-  const getSize = (count: number) => {
+  const getStyle = (count: number) => {
     const ratio = count / maxCount;
-    if (ratio > 0.7) return "text-lg font-bold";
-    if (ratio > 0.4) return "text-base font-semibold";
-    return "text-sm font-medium";
+    if (ratio > 0.7) return "text-sm font-bold text-violet-300 bg-violet-500/15 border-violet-500/20";
+    if (ratio > 0.4) return "text-xs font-semibold text-indigo-300 bg-indigo-500/10 border-indigo-500/15";
+    return "text-xs font-medium text-white/50 bg-white/5 border-white/10";
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Top Keywords</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2">
-          {keywords.map((kw) => (
-            <Badge
-              key={kw.word}
-              variant="secondary"
-              className={`${getSize(kw.count)} cursor-default`}
-            >
-              {kw.word}
-              <span className="ml-1 opacity-60">{kw.count}</span>
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="glass-card rounded-xl p-6">
+      <h3 className="text-lg font-semibold text-white/90 mb-4">Top Keywords</h3>
+      <div className="flex flex-wrap gap-2">
+        {keywords.map((kw) => (
+          <span
+            key={kw.word}
+            className={`px-3 py-1 rounded-full border cursor-default transition-all hover:scale-105 ${getStyle(kw.count)}`}
+          >
+            {kw.word}
+            <span className="ml-1.5 opacity-50">{kw.count}</span>
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

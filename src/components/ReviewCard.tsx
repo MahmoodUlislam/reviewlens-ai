@@ -1,7 +1,5 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Star, User, CheckCircle2 } from "lucide-react";
 import { Review } from "@/types";
 import { cn } from "@/lib/utils";
@@ -12,71 +10,68 @@ interface ReviewCardProps {
 }
 
 export default function ReviewCard({ review, index }: ReviewCardProps) {
-  const sentimentColor = {
-    POSITIVE: "bg-green-100 text-green-800",
-    NEGATIVE: "bg-red-100 text-red-800",
-    NEUTRAL: "bg-gray-100 text-gray-800",
-    MIXED: "bg-yellow-100 text-yellow-800",
+  const sentimentStyles = {
+    POSITIVE: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+    NEGATIVE: "bg-red-500/15 text-red-400 border-red-500/20",
+    NEUTRAL: "bg-slate-500/15 text-slate-400 border-slate-500/20",
+    MIXED: "bg-amber-500/15 text-amber-400 border-amber-500/20",
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-xs text-muted-foreground font-mono">
-                #{index + 1}
-              </span>
-              <div className="flex items-center">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "w-3.5 h-3.5",
-                      i < review.rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300"
-                    )}
-                  />
-                ))}
-              </div>
-              {review.sentiment && (
-                <Badge
-                  variant="secondary"
+    <div className="glass-card rounded-xl p-4 group">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="text-[10px] text-white/25 font-mono bg-white/5 px-1.5 py-0.5 rounded">
+              #{index + 1}
+            </span>
+            <div className="flex items-center">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
                   className={cn(
-                    "text-xs",
-                    sentimentColor[review.sentiment.label]
+                    "w-3.5 h-3.5",
+                    i < review.rating
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-white/10"
                   )}
-                >
-                  {review.sentiment.label.toLowerCase()}
-                </Badge>
-              )}
+                />
+              ))}
             </div>
-            {review.title && (
-              <h4 className="font-semibold text-sm mb-1 line-clamp-1">
-                {review.title}
-              </h4>
-            )}
-            <p className="text-sm text-muted-foreground line-clamp-3">
-              {review.body}
-            </p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <User className="w-3 h-3" />
-                {review.reviewer}
+            {review.sentiment && (
+              <span
+                className={cn(
+                  "text-[10px] px-2 py-0.5 rounded-full border font-medium",
+                  sentimentStyles[review.sentiment.label]
+                )}
+              >
+                {review.sentiment.label.toLowerCase()}
               </span>
-              {review.verified && (
-                <span className="flex items-center gap-1 text-green-600">
-                  <CheckCircle2 className="w-3 h-3" />
-                  Verified
-                </span>
-              )}
-              {review.date && <span>{review.date}</span>}
-            </div>
+            )}
+          </div>
+          {review.title && (
+            <h4 className="font-semibold text-sm text-white/80 mb-1 line-clamp-1">
+              {review.title}
+            </h4>
+          )}
+          <p className="text-sm text-white/40 line-clamp-3 leading-relaxed">
+            {review.body}
+          </p>
+          <div className="flex items-center gap-3 mt-2.5 text-xs text-white/25">
+            <span className="flex items-center gap-1">
+              <User className="w-3 h-3" />
+              {review.reviewer}
+            </span>
+            {review.verified && (
+              <span className="flex items-center gap-1 text-emerald-400/60">
+                <CheckCircle2 className="w-3 h-3" />
+                Verified
+              </span>
+            )}
+            {review.date && <span>{review.date}</span>}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

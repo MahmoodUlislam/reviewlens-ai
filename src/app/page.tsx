@@ -7,57 +7,82 @@ export default function Home() {
     <>
       <Header />
       <main className="flex-1">
-        {/* Hero section */}
-        <section className="py-16 px-4">
-          <div className="max-w-4xl mx-auto text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+        <section className="relative py-20 px-4 overflow-hidden">
+          {/* Floating gradient orbs */}
+          <div className="absolute top-20 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-[150px] pointer-events-none" />
+          <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="max-w-4xl mx-auto text-center mb-14 relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-violet-300 mb-6 animate-fade-up">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Powered by Amazon Bedrock &amp; Guardrails
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-up delay-100" style={{ animationFillMode: 'backwards' }}>
               Review Intelligence,
               <br />
-              <span className="text-primary/70">Guardrailed by AI</span>
+              <span className="gradient-text">Guardrailed by AI</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+
+            <p className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed animate-fade-up delay-200" style={{ animationFillMode: 'backwards' }}>
               Ingest product reviews from any platform, analyze sentiment and
-              trends, and interrogate the data through a scope-guarded AI
+              trends, then interrogate the data through a scope-guarded AI
               assistant that never drifts off-topic.
             </p>
           </div>
 
-          <IngestForm />
+          <div className="animate-fade-up delay-300" style={{ animationFillMode: 'backwards' }}>
+            <IngestForm />
+          </div>
 
-          {/* Features grid */}
-          <div className="max-w-4xl mx-auto mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Feature cards */}
+          <div className="max-w-5xl mx-auto mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up delay-400" style={{ animationFillMode: 'backwards' }}>
             {[
               {
                 icon: Zap,
                 title: "Instant Ingestion",
                 desc: "Scrape reviews from Amazon or upload CSV data in seconds",
+                glow: "glow-purple",
+                iconBg: "from-violet-500 to-purple-600",
               },
               {
                 icon: BarChart3,
                 title: "Smart Analytics",
-                desc: "Rating distribution, sentiment analysis powered by AWS Comprehend",
+                desc: "Rating distribution, sentiment analysis via AWS Comprehend",
+                glow: "glow-blue",
+                iconBg: "from-indigo-500 to-blue-600",
               },
               {
                 icon: MessageSquare,
                 title: "AI Q&A",
                 desc: "Ask questions about reviews with cited, data-backed answers",
+                glow: "glow-cyan",
+                iconBg: "from-cyan-500 to-teal-600",
               },
               {
                 icon: Shield,
                 title: "Dual Scope Guard",
                 desc: "Bedrock Guardrails + system prompt — never drifts off-topic",
+                glow: "glow-green",
+                iconBg: "from-emerald-500 to-green-600",
               },
             ].map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.title} className="text-center p-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                    <Icon className="w-5 h-5 text-primary" />
+                <div
+                  key={feature.title}
+                  className={`glass-card rounded-xl p-5 text-center group cursor-default`}
+                >
+                  <div
+                    className={`w-11 h-11 rounded-xl bg-linear-to-br ${feature.iconBg} flex items-center justify-center mx-auto mb-3.5 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">
+                  <h3 className="font-semibold text-sm text-white/90 mb-1.5">
                     {feature.title}
                   </h3>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-white/40 leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
@@ -66,11 +91,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-          <p>
-            Built with Next.js, Amazon Bedrock, Bedrock Guardrails &amp; Amazon
-            Comprehend
+        <footer className="border-t border-white/5 py-8 text-center">
+          <p className="text-xs text-white/30">
+            Built with Next.js 16 &middot; Amazon Bedrock &middot; Bedrock Guardrails &middot; Amazon Comprehend
           </p>
         </footer>
       </main>

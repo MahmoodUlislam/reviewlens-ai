@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Star, MessageSquare, Calendar, TrendingUp } from "lucide-react";
 import { ReviewMetadata, AnalyticsData } from "@/types";
 
@@ -18,9 +17,7 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
 
   const positivePercent =
     sentimentTotal > 0
-      ? Math.round(
-          (analytics.sentimentBreakdown.positive / sentimentTotal) * 100
-        )
+      ? Math.round((analytics.sentimentBreakdown.positive / sentimentTotal) * 100)
       : 0;
 
   const stats = [
@@ -28,28 +25,33 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
       label: "Total Reviews",
       value: metadata.totalReviews.toLocaleString(),
       icon: MessageSquare,
-      color: "text-blue-500",
+      gradient: "from-violet-500 to-purple-600",
+      glow: "shadow-violet-500/20",
     },
     {
       label: "Average Rating",
       value: analytics.averageRating.toFixed(1),
       icon: Star,
-      color: "text-yellow-500",
+      gradient: "from-amber-500 to-orange-600",
+      glow: "shadow-amber-500/20",
       suffix: "/ 5",
     },
     {
       label: "Positive Sentiment",
       value: `${positivePercent}%`,
       icon: TrendingUp,
-      color: "text-green-500",
+      gradient: "from-emerald-500 to-green-600",
+      glow: "shadow-emerald-500/20",
     },
     {
       label: "Date Range",
-      value: metadata.dateRange.earliest === "Unknown"
-        ? "N/A"
-        : `${metadata.dateRange.earliest.slice(0, 10)}`,
+      value:
+        metadata.dateRange.earliest === "Unknown"
+          ? "N/A"
+          : metadata.dateRange.earliest.slice(0, 10),
       icon: Calendar,
-      color: "text-purple-500",
+      gradient: "from-cyan-500 to-blue-600",
+      glow: "shadow-cyan-500/20",
       suffix:
         metadata.dateRange.latest !== "Unknown"
           ? ` — ${metadata.dateRange.latest.slice(0, 10)}`
@@ -59,31 +61,35 @@ export default function StatsCards({ metadata, analytics }: StatsCardsProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat) => {
+      {stats.map((stat, i) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.label}>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-2 rounded-lg bg-muted ${stat.color}`}
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="text-xl font-bold">
-                    {stat.value}
-                    {stat.suffix && (
-                      <span className="text-sm font-normal text-muted-foreground">
-                        {stat.suffix}
-                      </span>
-                    )}
-                  </p>
-                </div>
+          <div
+            key={stat.label}
+            className="glass-card rounded-xl p-5 animate-fade-up"
+            style={{ animationDelay: `${i * 0.1}s`, animationFillMode: 'backwards' }}
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className={`w-11 h-11 rounded-xl bg-linear-to-br ${stat.gradient} flex items-center justify-center shadow-lg ${stat.glow}`}
+              >
+                <Icon className="w-5 h-5 text-white" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-wider">
+                  {stat.label}
+                </p>
+                <p className="text-2xl font-bold text-white/90">
+                  {stat.value}
+                  {stat.suffix && (
+                    <span className="text-sm font-normal text-white/30 ml-1">
+                      {stat.suffix}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
         );
       })}
     </div>

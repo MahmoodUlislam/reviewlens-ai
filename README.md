@@ -9,69 +9,71 @@ A secure, web-based portal that ingests product reviews from Amazon and enables 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Next.js 16 (App Router)                   │
+┌───────────────────────────────────────────────────────────────┐
+│                    Next.js 16 (App Router)                    │
 │                    Deployed on AWS Amplify                    │
-│                                                              │
-│   ┌───────────┐   ┌──────────────┐   ┌──────────────────┐   │
-│   │  Ingest    │   │  Dashboard    │   │  Q&A Chat        │   │
-│   │  URL+CSV   │   │  Stats+Charts │   │  Guardrailed     │   │
-│   └─────┬─────┘   └──────┬───────┘   └────────┬─────────┘   │
+│                                                               │
+│   ┌─────────────┐   ┌──────────────┐   ┌──────────────────┐   │
+│   │  Ingest     │   │ Dashboard    │   │  Q&A Chat        │   │
+│   │  URL+CSV    │   │ Stats+Charts │   │  Guardrailed     │   │
+│   └─────┬───────┘   └──────┬───────┘   └────────┬─────────┘   │
 │         │                │                     │              │
-│   ┌─────▼────────────────▼─────────────────────▼──────────┐  │
+│   ┌─────▼────────────────▼─────────────────────▼───────────┐  │
 │   │                Next.js API Routes                      │  │
 │   │  POST /api/ingest  — scrape or parse CSV               │  │
 │   │  POST /api/chat    — guardrailed Q&A (SSE streaming)   │  │
 │   │  GET  /api/reviews — retrieve stored reviews           │  │
 │   │  GET  /api/analytics — sentiment + stats               │  │
-│   └───┬──────────────────────────────┬────────────────────┘  │
-│       │                              │                       │
-│  ┌────▼──────────┐    ┌──────────────▼──────────────────┐    │
-│  │ Scraper        │    │ Amazon Bedrock                   │    │
-│  │ Apify (primary)│    │ ┌──────────────────────────┐    │    │
-│  │ Lambda (backup)│    │ │ Bedrock Guardrails (L1)  │    │    │
-│  │ CSV (fallback) │    │ │ Denied topic policies    │    │    │
-│  └────────────────┘    │ └───────────┬──────────────┘    │    │
-│                        │ ┌───────────▼──────────────┐    │    │
-│  ┌────────────────┐    │ │ Claude 3.5 Haiku (L2)   │    │    │
-│  │ AWS Comprehend │    │ │ System prompt guard     │    │    │
-│  │ (Sentiment)    │    │ └──────────────────────────┘    │    │
-│  └────────────────┘    └─────────────────────────────────┘    │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐    │
-│  │  In-Memory Store (Map<sessionId, ReviewSession>)     │    │
-│  └──────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+│   └───┬──────────────────────────────┬─────────────────────┘  │
+│       │                              │                        │
+│  ┌────▼───────────┐    ┌──────────────▼───────────────────┐   │
+│  │ Scraper        │    │ Amazon Bedrock                   │   │
+│  │ Apify (primary)│    │ ┌──────────────────────────┐     │   │
+│  │ Lambda (backup)│    │ │ Bedrock Guardrails (L1)  │     │   │
+│  │ CSV (fallback) │    │ │ Denied topic policies    │     │   │
+│  └────────────────┘    │ └───────────┬──────────────┘     │   │
+│                        │ ┌───────────▼───────────────┐    │   │
+│  ┌────────────────┐    │ │ Claude 3.5 Haiku (L2)     │    │   │
+│  │ AWS Comprehend │    │ │ System prompt guard       │    │   │
+│  │ (Sentiment)    │    │ └───────────────────────────┘    │   │
+│  └────────────────┘    └──────────────────────────────────┘   │
+│                                                               │
+│  ┌───────────────────────────────────────────────────────┐    │
+│  │  In-Memory Store (Map<sessionId, ReviewSession>)      │    │
+│  └───────────────────────────────────────────────────────┘    │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16.2 (App Router, TypeScript, Turbopack) |
-| Styling | Tailwind CSS v4 + shadcn/ui |
-| LLM | Amazon Bedrock — Claude 3.5 Haiku |
-| Scope Guard L1 | Amazon Bedrock Guardrails (denied topic policies) |
-| Scope Guard L2 | System prompt engineering |
-| Sentiment Analysis | Amazon Comprehend |
-| Scraping (primary) | Apify — Amazon Reviews Scraper |
-| Scraping (backup) | AWS Lambda + Puppeteer + @sparticuz/chromium |
-| Import (fallback) | CSV upload / paste |
-| Charts | Recharts |
-| Storage | In-memory (prototype) |
-| Deployment | AWS Amplify |
+| Layer              | Technology                                        |
+| ------------------ | ------------------------------------------------- |
+| Framework          | Next.js 16.2 (App Router, TypeScript, Turbopack)  |
+| Styling            | Tailwind CSS v4 + shadcn/ui                       |
+| LLM                | Amazon Bedrock — Claude 3.5 Haiku                 |
+| Scope Guard L1     | Amazon Bedrock Guardrails (denied topic policies) |
+| Scope Guard L2     | System prompt engineering                         |
+| Sentiment Analysis | Amazon Comprehend                                 |
+| Scraping (primary) | Apify — Amazon Reviews Scraper                    |
+| Scraping (backup)  | AWS Lambda + Puppeteer + @sparticuz/chromium      |
+| Import (fallback)  | CSV upload / paste                                |
+| Charts             | Recharts                                          |
+| Storage            | In-memory (prototype)                             |
+| Deployment         | AWS Amplify                                       |
 
 ## Key Design Decision: Dual-Layer Scope Guard
 
 The assignment emphasizes scope guard enforcement. Rather than relying solely on a system prompt, I implemented a **dual-layer approach**:
 
 ### Layer 1 — Amazon Bedrock Guardrails (Infrastructure-Level)
+
 - Configured via AWS with **denied topic policies**: weather, news, politics, sports, other review platforms, general knowledge, competitor comparisons
 - Applied to every Bedrock API call via `guardrailConfig`
 - Blocks off-topic queries **before the LLM even processes them**
 - Returns a structured intervention that the UI displays distinctly
 
 ### Layer 2 — System Prompt Engineering (Application-Level)
+
 - Strict scoping: "You ONLY answer about the provided reviews"
 - Citation requirement: responses must reference specific review numbers
 - Graceful decline template for edge cases that slip past the guardrail
@@ -90,6 +92,7 @@ Three-tier fallback for reliability:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
 - AWS account with Bedrock access (Claude 3.5 Haiku enabled)
 - Apify account (free tier: 5 USD/month compute)
