@@ -166,7 +166,11 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
           boundary = buffer.indexOf("\n\n");
         }
       }
-    } catch {
+    } catch (err) {
+      // Don't show error for intentional aborts (unmount, navigation)
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return;
+      }
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId

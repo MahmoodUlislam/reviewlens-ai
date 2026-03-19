@@ -39,14 +39,25 @@ export async function POST(request: NextRequest) {
     let session = getSession(sessionId);
 
     if (!session && sessionData) {
-      const restored: ReviewSession = {
-        sessionId,
-        reviews: sessionData.reviews,
-        metadata: sessionData.metadata,
-        analytics: sessionData.analytics,
-      };
-      setSession(sessionId, restored);
-      session = restored;
+      // Basic validation: ensure sessionData has the expected shape
+      const reviews = Array.isArray(sessionData.reviews) ? sessionData.reviews : [];
+      const meta = sessionData.metadata;
+      if (
+        reviews.length > 0 &&
+        meta &&
+        typeof meta.platform === "string" &&
+        typeof meta.productName === "string" &&
+        typeof meta.totalReviews === "number"
+      ) {
+        const restored: ReviewSession = {
+          sessionId,
+          reviews: reviews.slice(0, 500), // Cap at 500 reviews to prevent abuse
+          metadata: meta,
+          analytics: sessionData.analytics,
+        };
+        setSession(sessionId, restored);
+        session = restored;
+      }
     }
 
     if (!session) {

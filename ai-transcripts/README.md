@@ -13,6 +13,7 @@ These are curated summaries of AI-assisted development sessions for ReviewLens A
 | [05 - Deployment & Config](session-05-deployment-and-config.md) | Amplify, env cleanup, dependency trimming | Production-ready build config, cheerio removal |
 | [06 - Multi-Platform & Testing](session-06-multiplatform-testing-branding.md) | Google Maps/Yelp support, Vitest, branding | Platform-extensible ingestion, 4 test suites, custom logos |
 | [07 - Architecture Diagrams](session-07-architecture-diagrams.md) | draw.io diagrams, vision-based scraping docs | 5 architecture diagrams, future scraping concept |
+| [08 - Code Audit & Hardening](session-08-code-audit-and-hardening.md) | Full codebase audit, bug fixes, security hardening | 20 issues fixed: memory leak, input validation, parallel processing, React 19 lint compliance |
 
 ## AI Tool Used
 - **Claude Code** (CLI) powered by Claude Opus 4.6

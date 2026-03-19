@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     let reviews: Review[] = [];
     let productName = "Unknown Product";
-    let productUrl = url || "";
+    const productUrl = url || "";
     let overallRating: number | undefined;
     let totalGlobalRatings: number | undefined;
     let csvWarnings: string[] = [];

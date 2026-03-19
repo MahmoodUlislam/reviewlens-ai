@@ -12,41 +12,43 @@ import ChatDrawer from "@/components/ChatDrawer";
 import { Review, ReviewMetadata, AnalyticsData } from "@/types";
 import { MessageSquare } from "lucide-react";
 
+interface DashboardData {
+  sessionId: string;
+  reviews: Review[];
+  metadata: ReviewMetadata;
+  analytics: AnalyticsData;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [metadata, setMetadata] = useState<ReviewMetadata | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showAllReviews, setShowAllReviews] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const closeChat = useCallback(() => setChatOpen(false), []);
-
-  useEffect(() => {
+  const [data] = useState<DashboardData | null>(() => {
+    if (typeof window === "undefined") return null;
     const sid = sessionStorage.getItem("reviewlens_session");
     const metaStr = sessionStorage.getItem("reviewlens_metadata");
     const reviewsStr = sessionStorage.getItem("reviewlens_reviews");
     const analyticsStr = sessionStorage.getItem("reviewlens_analytics");
-
-    if (!sid || !metaStr || !reviewsStr || !analyticsStr) {
-      router.push("/");
-      return;
-    }
-
+    if (!sid || !metaStr || !reviewsStr || !analyticsStr) return null;
     try {
-      setSessionId(sid);
-      setMetadata(JSON.parse(metaStr));
-      setReviews(JSON.parse(reviewsStr));
-      setAnalytics(JSON.parse(analyticsStr));
+      return {
+        sessionId: sid,
+        reviews: JSON.parse(reviewsStr),
+        metadata: JSON.parse(metaStr),
+        analytics: JSON.parse(analyticsStr),
+      };
     } catch {
-      router.push("/");
-      return;
+      return null;
     }
-    setLoading(false);
-  }, [router]);
+  });
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const closeChat = useCallback(() => setChatOpen(false), []);
 
-  if (loading) {
+  // Redirect if no session data (effect only handles navigation, no setState)
+  useEffect(() => {
+    if (!data) router.push("/");
+  }, [data, router]);
+
+  if (!data) {
     return (
       <>
         <Header />
@@ -65,8 +67,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!metadata || !analytics) return null;
-
+  const { sessionId, reviews, metadata, analytics } = data;
   const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 6);
 
   return (
@@ -148,14 +149,12 @@ export default function DashboardPage() {
       )}
 
       {/* Chat drawer */}
-      {sessionId && metadata && (
-        <ChatDrawer
-          open={chatOpen}
-          onClose={closeChat}
-          sessionId={sessionId}
-          metadata={metadata}
-        />
-      )}
+      <ChatDrawer
+        open={chatOpen}
+        onClose={closeChat}
+        sessionId={sessionId}
+        metadata={metadata}
+      />
     </>
   );
 }

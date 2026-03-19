@@ -47,7 +47,7 @@ export async function* streamBedrockResponse(
     system: [{ text: systemPrompt }],
     messages: bedrockMessages,
     inferenceConfig: {
-      maxTokens: 1024,
+      maxTokens: 4096,
       temperature: 0.3,
     },
     ...(guardrailConfig && { guardrailConfig: guardrailConfig }),

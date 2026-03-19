@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search, BarChart3 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,11 +8,8 @@ import { cn } from "@/lib/utils";
 
 export default function Header() {
   const pathname = usePathname();
-  const [hasSession, setHasSession] = useState(false);
-
-  useEffect(() => {
-    setHasSession(!!sessionStorage.getItem("reviewlens_session"));
-  }, [pathname]);
+  // Computed during render — pathname changes trigger re-renders, keeping this fresh
+  const hasSession = typeof window !== "undefined" && !!sessionStorage.getItem("reviewlens_session");
 
   const navItems = [
     { href: "/", label: "Ingest", icon: Search, alwaysEnabled: true },
@@ -64,7 +60,7 @@ export default function Header() {
                   className={cn(
                     "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
                     isActive
-                      ? "bg-gradient-to-r from-violet-500/20 to-indigo-500/20 text-violet-300 border border-violet-500/20 shadow-lg shadow-violet-500/10"
+                      ? "bg-linear-to-r from-violet-500/20 to-indigo-500/20 text-violet-300 border border-violet-500/20 shadow-lg shadow-violet-500/10"
                       : "text-white/50 hover:text-white/80 hover:bg-white/5"
                   )}
                 >

@@ -59,6 +59,8 @@ const PLATFORM_CONFIG: Record<string, PlatformConfig> = {
   },
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB — matches server limit
+
 export default function IngestForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,6 +111,11 @@ export default function IngestForm() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum size is 5 MB.`);
+      return;
+    }
+    setError("");
     setFileName(file.name);
     setPastedCsv("");
     const reader = new FileReader();
@@ -346,6 +353,11 @@ function CsvUploadFields({
 
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (ext !== "csv" && ext !== "txt") return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      // Can't call setError directly — handled by parent via handleFileUpload
+      return;
+    }
 
     setFileName(file.name);
     setPastedCsv("");

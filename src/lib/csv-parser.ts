@@ -264,11 +264,11 @@ function normalizeDate(raw: string): string {
   // Try DD/MM/YYYY or DD-MM-YYYY (ambiguous — assume day-first if first part > 12)
   const dmy = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
   if (dmy) {
-    let [, d, m, y] = dmy;
-    if (y.length === 2) y = (parseInt(y) > 50 ? "19" : "20") + y;
+    const [, d, m, y] = dmy;
+    const fullYear = y.length === 2 ? (parseInt(y) > 50 ? "19" : "20") + y : y;
     // If first number > 12, it's definitely the day
     if (parseInt(d) > 12) {
-      const attempt = new Date(`${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`);
+      const attempt = new Date(`${fullYear}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`);
       if (!isNaN(attempt.getTime())) return attempt.toISOString().split("T")[0];
     }
   }

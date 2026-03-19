@@ -8,7 +8,11 @@ For this prototype, ReviewLens AI uses **direct LLM invocation via Amazon Bedroc
 - System prompt engineering is transparent and auditable — evaluators can inspect exactly how scope guarding works
 - Minimal infrastructure overhead — no additional AWS services beyond Bedrock and Comprehend
 - Conversation history is maintained client-side and sent with each request for multi-turn context
-- Streaming responses via Bedrock ConverseStream API for real-time UX
+- Streaming responses via Bedrock ConverseStream API for real-time UX (4096 max output tokens)
+- **Server-side session store** with TTL-based eviction (1 hour) and capacity cap (100 sessions) prevents memory leaks; client-side sessionStorage provides rehydration fallback when workers recycle
+- **Input validation hardened**: chat history sanitized (role/content/length caps), CSV uploads size-limited (5 MB), Apify token sent via Authorization header
+- **Parallel sentiment analysis**: Comprehend batches run concurrently via `Promise.all`, cutting ingestion time proportionally
+- **AbortController** on client-side chat fetch prevents orphaned streams on navigation
 
 This is sufficient and performant for the prototype's review volume. The following improvements would be necessary for a production-scale system.
 
@@ -75,9 +79,10 @@ Streaming Response with Citations
 ## Phase 2: Data Persistence & Multi-Tenancy
 
 ### DynamoDB for Session Persistence
-- Replace in-memory store with DynamoDB
-- Sessions survive server restarts and support horizontal scaling
-- TTL-based auto-expiry for sessions (e.g., 24-hour retention)
+
+- The current in-memory store already implements TTL eviction (1 hour) and capacity caps (100 sessions), with client-side sessionStorage as a rehydration fallback
+- **Next step:** Replace the in-memory `Map` with DynamoDB for persistence across server restarts and horizontal scaling
+- Extend TTL to 24 hours with DynamoDB's native TTL feature
 - Table design: `PK: sessionId`, `SK: reviewId` for efficient per-review access
 
 ### S3 for Review Storage

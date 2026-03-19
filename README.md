@@ -1,6 +1,6 @@
 # ReviewLens AI — Review Intelligence Portal
 
-A secure, web-based portal that ingests product reviews from **Amazon, Google Maps, and Yelp** and enables analysts to interrogate that data through a **guardrailed AI Q&A interface** — without the AI ever drifting off-topic. The platform-agnostic architecture is designed to expand to additional review sources in the future.
+A secure, web-based portal that ingests product reviews from **Amazon** and **Google Maps** (or any platform via CSV upload) and enables analysts to interrogate that data through a **guardrailed AI Q&A interface** — without the AI ever drifting off-topic. The platform-agnostic architecture is designed to expand to additional review sources in the future.
 
 **Live URL:** _[deployed URL here]_
 
@@ -37,7 +37,8 @@ A secure, web-based portal that ingests product reviews from **Amazon, Google Ma
 │  └────────────────┘    └──────────────────────────────────┘   │
 │                                                               │
 │  ┌───────────────────────────────────────────────────────┐    │
-│  │  SessionStorage (client-side session persistence)     │    │
+│  │  In-Memory Store (TTL 1hr, max 100 sessions)         │    │
+│  │  + SessionStorage (client-side rehydration fallback)  │    │
 │  └───────────────────────────────────────────────────────┘    │
 └───────────────────────────────────────────────────────────────┘
 ```
@@ -52,12 +53,12 @@ A secure, web-based portal that ingests product reviews from **Amazon, Google Ma
 | Scope Guard L1     | Amazon Bedrock Guardrails (denied topic policies)     |
 | Scope Guard L2     | System prompt engineering                             |
 | Sentiment Analysis | Amazon Comprehend (BatchDetectSentiment)              |
-| Scraping           | Apify REST API (Amazon, Google Maps, Yelp)            |
+| Scraping           | Apify REST API (Amazon, Google Maps)                  |
 | Overall Rating     | Direct product page fetch + regex extraction (Amazon) |
 | Import (fallback)  | CSV upload / paste                                    |
 | Charts             | Recharts                                              |
 | Chat Rendering     | react-markdown with custom theme                      |
-| Storage            | sessionStorage (client-side)                          |
+| Storage            | In-memory store (TTL + cap) + sessionStorage (client) |
 | Deployment         | AWS Amplify                                           |
 
 ## Key Design Decision: Dual-Layer Scope Guard
@@ -87,9 +88,9 @@ Two-tier approach:
 1. **Apify REST API** (primary) — Platform-specific scrapers via Apify actors, called through a unified REST API dispatcher. Each platform has its own actor and field mapping:
    - **Amazon** — `junglee~amazon-reviews-scraper` + parallel product page fetch for overall rating/global ratings
    - **Google Maps** — `compass~google-maps-reviews-scraper` with Local Guide detection
-   - **Yelp** — `yin~yelp-scraper` with business URL parsing
    - The architecture is designed to be **easily extensible** — adding a new platform requires only a new actor ID, field mapping function, and URL validator in `scraper.ts`.
-2. **CSV Upload** (always works) — User pastes or uploads review data directly. Supports flexible column names.
+   - Apify token is sent via `Authorization` header (not URL query parameter) for security.
+2. **CSV Upload** (always works) — User pastes or uploads review data directly. Fuzzy auto-detection engine matches arbitrary column names (e.g., `star_rating` → `rating`, `customer_feedback` → `body`) via keyword matching + content profiling. Supports any rating scale (5, 10, 100-point) with automatic normalization.
 
 ## Getting Started
 
@@ -151,9 +152,9 @@ Test suites cover the core business logic:
 | Suite        | What it tests                                                                                                                |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `csv-parser` | Auto-detection of arbitrary column names, rating scale normalization, date parsing, empty row filtering, whitespace trimming |
-| `analytics`  | Rating distribution, averages, sentiment breakdown, keyword extraction                                                       |
-| `prompts`    | System prompt construction, scope guard rules, decline template                                                              |
-| `store`      | Session CRUD, existence checks, overwrite behavior                                                                           |
+| `analytics`  | Rating distribution, averages, sentiment breakdown, keyword extraction (single-pass)                                         |
+| `prompts`    | System prompt construction, scope enforcement rules, decline template with dynamic context                                   |
+| `store`      | Session CRUD, existence checks, overwrite behavior (TTL-based eviction)                                                      |
 
 ### Testing CSV Upload with Example Data
 
@@ -195,8 +196,8 @@ This file contains **20 realistic reviews** for a fictional "ProBass X500 Wirele
 
 ## Assumptions
 
-1. **Three platforms currently supported** — Amazon, Google Maps, and Yelp via Apify scrapers; additional platforms (G2, Capterra, Trustpilot, etc.) can be added by extending the scraper dispatcher
-2. **Client-side storage** — sessionStorage for prototype; production would use DynamoDB
+1. **Two platforms currently supported** — Amazon and Google Maps via Apify scrapers; additional platforms (G2, Capterra, Trustpilot, etc.) can be added by extending the scraper dispatcher. Any platform works via CSV upload.
+2. **Hybrid storage** — Server-side in-memory store with TTL (1 hour) and capacity cap (100 sessions) + client-side sessionStorage for rehydration on worker recycle. Production would use DynamoDB.
 3. **No user authentication** — Per assignment requirements, the app is directly accessible
 4. **Bedrock costs** — Claude Opus 4.6 pay-per-token; total demo cost < $1
 5. **Apify free tier** — 5 USD/month compute credit is sufficient for demo and evaluation
@@ -214,14 +215,28 @@ Detailed draw.io diagrams are available in [`docs/diagrams/`](docs/diagrams/) �
 | Backend Structure | `backend-structure.drawio` | API routes, service modules, and external service connections |
 | Frontend Structure | `frontend-structure.drawio` | Pages, component hierarchy, data flow, and navigation |
 
+## Hardening & Security
+
+The prototype includes several production-minded safeguards:
+
+| Area | Implementation |
+| --- | --- |
+| **Session management** | TTL-based eviction (1 hr) + max 100 sessions cap prevents memory leaks |
+| **Input validation** | Chat history sanitized (valid roles only, 50 message cap, 10K char limit per message) |
+| **Body size limits** | CSV uploads capped at 5 MB on both client and server; session rehydration capped at 500 reviews |
+| **API token security** | Apify token sent via `Authorization` header, never in URL query params |
+| **Streaming safety** | `AbortController` cancels in-flight requests on navigation/unmount; `AbortError` silently ignored |
+| **Parallel processing** | Comprehend sentiment batches run in parallel via `Promise.all` for faster ingestion |
+| **Chronological sorting** | Date sorting uses `Date` parsing with fallback, not naive lexicographic sort |
+
 ## What I'd Do With More Time
 
-- **DynamoDB persistence** — Sessions survive server restarts
+- **DynamoDB persistence** — Sessions survive server restarts and scale horizontally
 - **Bedrock Agent + Knowledge Base** — RAG for 10,000+ reviews beyond context window limits
 - **More review platforms** — G2, Capterra, Trustpilot, TripAdvisor (architecture already supports plug-in scrapers)
 - **Multi-product comparison** — Compare sentiment across products
 - **PDF/CSV export** — Download analysis reports
-- **Rate limiting** — Protect the Bedrock API from abuse
+- **Rate limiting** — Per-IP or per-session throttling to protect the Bedrock API from abuse
 - **Review pagination** — Handle products with 10,000+ reviews
 - **E2E tests** — Playwright tests for the full flow
 
