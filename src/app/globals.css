@@ -182,6 +182,7 @@
     transparent 70%
   );
   animation: shine 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes shine {
