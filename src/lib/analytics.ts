@@ -20,27 +20,27 @@ const STOP_WORDS = new Set([
 ]);
 
 export function computeAnalytics(reviews: Review[]): AnalyticsData {
-  // Rating distribution
   const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  const sentimentBreakdown = { positive: 0, negative: 0, neutral: 0, mixed: 0 };
+  const wordCounts = new Map<string, number>();
+  let ratingSum = 0;
+
+  // Single pass over all reviews
   for (const review of reviews) {
+    // Rating distribution + sum
     const rounded = Math.round(review.rating);
     if (rounded >= 1 && rounded <= 5) {
       ratingDistribution[rounded]++;
     }
-  }
+    ratingSum += review.rating;
 
-  // Sentiment breakdown
-  const sentimentBreakdown = { positive: 0, negative: 0, neutral: 0, mixed: 0 };
-  for (const review of reviews) {
+    // Sentiment breakdown
     if (review.sentiment) {
       const key = review.sentiment.label.toLowerCase() as keyof typeof sentimentBreakdown;
       sentimentBreakdown[key]++;
     }
-  }
 
-  // Top keywords
-  const wordCounts = new Map<string, number>();
-  for (const review of reviews) {
+    // Keyword extraction
     const text = `${review.title} ${review.body}`.toLowerCase();
     const words = text.match(/\b[a-z]{3,}\b/g) || [];
     for (const word of words) {
@@ -49,16 +49,13 @@ export function computeAnalytics(reviews: Review[]): AnalyticsData {
       }
     }
   }
+
   const topKeywords = Array.from(wordCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 20)
     .map(([word, count]) => ({ word, count }));
 
-  // Average rating
-  const averageRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
+  const averageRating = reviews.length > 0 ? ratingSum / reviews.length : 0;
 
   return {
     ratingDistribution,

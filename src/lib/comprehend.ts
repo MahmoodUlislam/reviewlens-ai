@@ -16,56 +16,65 @@ export async function analyzeSentiment(
   const batchSize = 25;
   const enrichedReviews = [...reviews];
 
+  // Build all batch promises up front so they run in parallel
+  const batchPromises: Promise<void>[] = [];
+
   for (let i = 0; i < reviews.length; i += batchSize) {
-    const batch = reviews.slice(i, i + batchSize);
+    const batchStart = i;
+    const batch = reviews.slice(batchStart, batchStart + batchSize);
     const texts = batch.map((r) => {
       const text = `${r.title} ${r.body}`.slice(0, 4900);
       // Comprehend requires non-empty text
       return text.trim() || "No content";
     });
 
-    try {
-      const command = new BatchDetectSentimentCommand({
-        TextList: texts,
-        LanguageCode: "en",
-      });
+    batchPromises.push(
+      (async () => {
+        try {
+          const command = new BatchDetectSentimentCommand({
+            TextList: texts,
+            LanguageCode: "en",
+          });
 
-      const response = await client.send(command);
+          const response = await client.send(command);
 
-      if (response.ResultList) {
-        for (const result of response.ResultList) {
-          if (result.Index !== undefined && result.Sentiment) {
-            const reviewIndex = i + result.Index;
+          if (response.ResultList) {
+            for (const result of response.ResultList) {
+              if (result.Index !== undefined && result.Sentiment) {
+                const reviewIndex = batchStart + result.Index;
+                enrichedReviews[reviewIndex] = {
+                  ...enrichedReviews[reviewIndex],
+                  sentiment: {
+                    label: result.Sentiment as SentimentResult["label"],
+                    score:
+                      result.SentimentScore?.[
+                        (result.Sentiment.charAt(0) +
+                          result.Sentiment.slice(1).toLowerCase()) as keyof typeof result.SentimentScore
+                      ] || 0,
+                  },
+                };
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Comprehend batch sentiment error:", error);
+          // Fallback: use rating-based sentiment
+          for (let j = 0; j < batch.length; j++) {
+            const reviewIndex = batchStart + j;
+            const rating = batch[j].rating;
             enrichedReviews[reviewIndex] = {
               ...enrichedReviews[reviewIndex],
               sentiment: {
-                label: result.Sentiment as SentimentResult["label"],
-                score:
-                  result.SentimentScore?.[
-                    (result.Sentiment.charAt(0) +
-                      result.Sentiment.slice(1).toLowerCase()) as keyof typeof result.SentimentScore
-                  ] || 0,
+                label: rating >= 4 ? "POSITIVE" : rating <= 2 ? "NEGATIVE" : "NEUTRAL",
+                score: 0.8,
               },
             };
           }
         }
-      }
-    } catch (error) {
-      console.error("Comprehend batch sentiment error:", error);
-      // Fallback: use rating-based sentiment
-      for (let j = 0; j < batch.length; j++) {
-        const reviewIndex = i + j;
-        const rating = batch[j].rating;
-        enrichedReviews[reviewIndex] = {
-          ...enrichedReviews[reviewIndex],
-          sentiment: {
-            label: rating >= 4 ? "POSITIVE" : rating <= 2 ? "NEGATIVE" : "NEUTRAL",
-            score: 0.8,
-          },
-        };
-      }
-    }
+      })()
+    );
   }
 
+  await Promise.all(batchPromises);
   return enrichedReviews;
 }

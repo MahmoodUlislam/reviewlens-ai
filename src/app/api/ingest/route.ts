@@ -7,10 +7,28 @@ import { setSession } from "@/lib/store";
 import { scrapeReviews } from "@/lib/scraper";
 import { Review, ReviewMetadata, ReviewSession } from "@/types";
 
+const MAX_CSV_SIZE = 5 * 1024 * 1024; // 5 MB
+
 export async function POST(request: NextRequest) {
   try {
+    // Check Content-Length before parsing body
+    const contentLength = parseInt(request.headers.get("content-length") || "0", 10);
+    if (contentLength > MAX_CSV_SIZE) {
+      return NextResponse.json(
+        { success: false, error: `Request too large. Maximum size is ${MAX_CSV_SIZE / 1024 / 1024} MB.` },
+        { status: 413 }
+      );
+    }
+
     const body = await request.json();
     const { type, url, csvData, platform = "Amazon" } = body;
+
+    if (type === "csv" && typeof csvData === "string" && csvData.length > MAX_CSV_SIZE) {
+      return NextResponse.json(
+        { success: false, error: `CSV data too large. Maximum size is ${MAX_CSV_SIZE / 1024 / 1024} MB.` },
+        { status: 413 }
+      );
+    }
 
     let reviews: Review[] = [];
     let productName = "Unknown Product";
@@ -80,11 +98,20 @@ export async function POST(request: NextRequest) {
     // Compute analytics
     const analytics = computeAnalytics(enrichedReviews);
 
-    // Sort reviews by date (newest first)
+    // Extract date range (sort chronologically via Date parsing)
     const dates = enrichedReviews
       .map((r) => r.date)
       .filter(Boolean)
-      .sort();
+      .sort((a, b) => {
+        const da = new Date(a).getTime();
+        const db = new Date(b).getTime();
+        // If both parse to valid dates, compare numerically
+        if (!isNaN(da) && !isNaN(db)) return da - db;
+        // Push unparseable dates to the end
+        if (isNaN(da)) return 1;
+        if (isNaN(db)) return -1;
+        return a.localeCompare(b);
+      });
 
     const metadata: ReviewMetadata = {
       platform,

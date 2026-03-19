@@ -61,13 +61,29 @@ export async function POST(request: NextRequest) {
     // Build system prompt with review context
     const systemPrompt = buildSystemPrompt(session.metadata, session.reviews);
 
+    // Sanitize history: only allow valid roles and string content
+    const MAX_HISTORY_MESSAGES = 50;
+    const MAX_MESSAGE_LENGTH = 10_000;
+
+    const sanitizedHistory = (Array.isArray(history) ? history : [])
+      .slice(-MAX_HISTORY_MESSAGES)
+      .filter(
+        (h: unknown): h is { role: string; content: string } =>
+          typeof h === "object" &&
+          h !== null &&
+          typeof (h as Record<string, unknown>).role === "string" &&
+          typeof (h as Record<string, unknown>).content === "string" &&
+          ["user", "assistant"].includes((h as Record<string, unknown>).role as string)
+      )
+      .map((h) => ({
+        role: h.role as "user" | "assistant",
+        content: h.content.slice(0, MAX_MESSAGE_LENGTH),
+      }));
+
     // Build conversation messages (include history for context)
     const messages = [
-      ...history.map((h: { role: string; content: string }) => ({
-        role: h.role as "user" | "assistant",
-        content: h.content,
-      })),
-      { role: "user" as const, content: message },
+      ...sanitizedHistory,
+      { role: "user" as const, content: message.slice(0, MAX_MESSAGE_LENGTH) },
     ];
 
     // Stream response using Bedrock with Guardrails

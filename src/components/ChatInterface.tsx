@@ -37,6 +37,7 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -45,6 +46,13 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Abort in-flight request on unmount
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const sendMessage = async (messageText?: string) => {
     const text = messageText || input.trim();
@@ -56,6 +64,9 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
       content: text,
       timestamp: new Date().toISOString(),
     };
+
+    // Capture current messages for history BEFORE updating state
+    const currentMessages = [...messages];
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -71,22 +82,27 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
     setMessages((prev) => [...prev, assistantMessage]);
 
     try {
-      const history = messages.map((m) => ({
+      const history = currentMessages.map((m) => ({
         role: m.role,
         content: m.content,
       }));
 
-      // On first message, send session data so the server can hydrate its store
-      // (Turbopack runs route handlers in separate workers with isolated memory)
+      // Always send session data so the server can rehydrate if its
+      // in-memory store was cleared (deploy, worker recycle, TTL expiry)
       let sessionData: Record<string, unknown> | undefined;
-      if (messages.length === 0) {
-        try {
-          const reviews = JSON.parse(sessionStorage.getItem("reviewlens_reviews") || "[]");
-          const meta = JSON.parse(sessionStorage.getItem("reviewlens_metadata") || "{}");
-          const analytics = JSON.parse(sessionStorage.getItem("reviewlens_analytics") || "{}");
+      try {
+        const reviews = JSON.parse(sessionStorage.getItem("reviewlens_reviews") || "[]");
+        const meta = JSON.parse(sessionStorage.getItem("reviewlens_metadata") || "{}");
+        const analytics = JSON.parse(sessionStorage.getItem("reviewlens_analytics") || "{}");
+        if (reviews.length > 0) {
           sessionData = { reviews, metadata: meta, analytics };
-        } catch { /* proceed without */ }
-      }
+        }
+      } catch { /* proceed without */ }
+
+      // Abort any previous in-flight request
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -96,6 +112,7 @@ export default function ChatInterface({ sessionId, metadata, compact }: ChatInte
           "Accept": "text/event-stream",
         },
         body: JSON.stringify({ sessionId, message: text, history, sessionData }),
+        signal: controller.signal,
       });
 
       if (!response.ok) throw new Error("Chat request failed");

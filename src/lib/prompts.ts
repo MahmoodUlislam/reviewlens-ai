@@ -34,11 +34,3 @@ DECLINE TEMPLATE — Use this when a question falls outside scope:
 REVIEWS DATA:
 ${reviewsSummary}`;
 }
-
-export function buildScopeGuardCheck(userMessage: string): string {
-  return `Evaluate whether this user question is answerable SOLELY from product/service reviews:
-"${userMessage}"
-
-If it asks about weather, news, other platforms, competitors not mentioned in reviews, general knowledge, coding, math, or anything unrelated to analyzing customer reviews — respond with EXACTLY: "OUT_OF_SCOPE: [reason]"
-If it's a valid review analysis question — respond with EXACTLY: "IN_SCOPE"`;
-}
