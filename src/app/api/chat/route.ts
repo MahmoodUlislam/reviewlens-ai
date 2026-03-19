@@ -153,7 +153,8 @@ export async function POST(request: NextRequest) {
           yield encoder.encode(
             `data: ${JSON.stringify({
               type: "error",
-              content: `[DEBUG] ${errorMessage}`,
+              content:
+                "An error occurred while generating a response. Please try again.",
             })}\n\n`
           );
         }

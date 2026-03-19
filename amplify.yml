@@ -6,7 +6,10 @@ frontend:
         - npm ci
     build:
       commands:
-        - env | grep -E '^(AWS_REGION|BEDROCK_|APIFY_)' >> .env.production
+        - echo "AWS_ACCESS_KEY_ID=$MY_AWS_ACCESS_KEY_ID" >> .env.production
+        - echo "AWS_SECRET_ACCESS_KEY=$MY_AWS_SECRET_ACCESS_KEY" >> .env.production
+        - echo "AWS_REGION=$MY_AWS_REGION" >> .env.production
+        - env | grep -E '^(BEDROCK_|APIFY_)' >> .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
