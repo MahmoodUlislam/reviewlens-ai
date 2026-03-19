@@ -10,6 +10,9 @@ These are curated summaries of AI-assisted development sessions for ReviewLens A
 | [02 - Scraping](session-02-scraping-and-ingestion.md) | Ingestion pipeline & Apify integration | Replaced SDK with REST API to fix Turbopack compatibility |
 | [03 - Streaming & UI](session-03-streaming-and-ui.md) | Real-time chat & glassmorphism polish | Pull-based SSE streaming, chat drawer, markdown rendering |
 | [04 - AWS Integration](session-04-aws-integration.md) | Comprehend, Bedrock, IAM permissions | Dual-layer guardrails, graceful fallbacks |
+| [05 - Deployment & Config](session-05-deployment-and-config.md) | Amplify, env cleanup, dependency trimming | Production-ready build config, cheerio removal |
+| [06 - Multi-Platform & Testing](session-06-multiplatform-testing-branding.md) | Google Maps/Yelp support, Vitest, branding | Platform-extensible ingestion, 4 test suites, custom logos |
+| [07 - Architecture Diagrams](session-07-architecture-diagrams.md) | draw.io diagrams, vision-based scraping docs | 5 architecture diagrams, future scraping concept |
 
 ## AI Tool Used
 - **Claude Code** (CLI) powered by Claude Opus 4.6
